@@ -34,7 +34,12 @@ namespace InventoryLib
         virtual void AddItem(BaseItem* item, bool& success);
         virtual void AddItem(BaseItem* item, int slot, bool& success);
 
-        virtual BaseItem* GetItemBySlot(int slot) const;
+        virtual void RemoveItem(BaseItem* item);
+        virtual void RemoveItem(BaseItem* item, bool& success);
+        virtual void RemoveItem(int slot);
+        virtual void RemoveItem(int slot, bool& success);
+
+        virtual BaseItem* GetItemInSlot(int slot) const;
 
         virtual int GetInventorySize() const
         {

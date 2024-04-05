@@ -132,6 +132,7 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount)
     SetSlotCount(newSlotCount, ignored);
 }
 
+
 void InventoryLib::Inventory::AddItem(BaseItem* item)
 {
     bool ignored;
@@ -168,8 +169,32 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, int slot, bool& success)
     success = true;
 }
 
-InventoryLib::BaseItem* InventoryLib::Inventory::GetItemBySlot(int slot) const
+
+void InventoryLib::Inventory::RemoveItem(BaseItem* item)
+{
+    bool ignored;
+    RemoveItem(item, ignored);
+}
+
+void InventoryLib::Inventory::RemoveItem(BaseItem* item, bool& success)
+{
+    success = false;
+
+}
+
+void InventoryLib::Inventory::RemoveItem(int slot)
+{
+    bool ignored;
+    RemoveItem(slot, ignored);
+}
+
+void InventoryLib::Inventory::RemoveItem(int slot, bool& success)
+{
+    success = false;
+}
+
+InventoryLib::BaseItem* InventoryLib::Inventory::GetItemInSlot(int slot) const
 {
     if (slot >= GetInventorySize() || slot < 0) return nullptr;
-    return nullptr;
+    return items->at(slot);
 }
