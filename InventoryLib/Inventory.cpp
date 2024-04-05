@@ -8,44 +8,40 @@
 #pragma region De/Constructors
 InventoryLib::Inventory::Inventory()
 {
-#ifdef DEBUG_PRINTING
+    #ifdef DEBUG_PRINTING
     printf("--- !!! --- \n Debugging is enabled. Comment out define DEBUG_PRINTING to disable when building\n--- !!! --- \n");
-#endif
-    this->slotCount = -1;
-    this->weight = -1;
+    #endif
+    this->maxWeight = -1;
     this->items = new std::vector<BaseItem*>();
 }
 
 InventoryLib::Inventory::Inventory(int newSlotCount)
 {
-#ifdef DEBUG_PRINTING
+    #ifdef DEBUG_PRINTING
     printf("Creating inventory with %i slots.\n", newSlotCount);
-#endif
+    #endif
 
-    this->slotCount = newSlotCount;
-    this->weight = -1.0f;
+    this->maxWeight = -1.0f;
     this->items = new std::vector<BaseItem*>(newSlotCount);
 }
 
 InventoryLib::Inventory::Inventory(float newWeight)
 {
-#ifdef DEBUG_PRINTING
-    printf("Creating inventory with %f weight.\n", newWeight);
-#endif
+    #ifdef DEBUG_PRINTING
+    printf("Creating inventory with %f maxWeight.\n", newWeight);
+    #endif
 
-    this->slotCount = -1;
-    this->weight = newWeight;
+    this->maxWeight = newWeight;
     this->items = new std::vector<BaseItem*>();
 }
 
 InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight)
 {
-#ifdef DEBUG_PRINTING
-    printf("Creating inventory with %i slots and %f weight.\n", newSlotCount, newWeight);
-#endif
+    #ifdef DEBUG_PRINTING
+    printf("Creating inventory with %i slots and %f maxWeight.\n", newSlotCount, newWeight);
+    #endif
 
-    this->slotCount = newSlotCount;
-    this->weight = newWeight;
+    this->maxWeight = newWeight;
     this->items = new std::vector<BaseItem*>(newSlotCount);
 }
 
@@ -53,9 +49,9 @@ InventoryLib::Inventory::~Inventory()
 {
     delete items;
     items = nullptr;
-#ifdef DEBUG_PRINTING
+    #ifdef DEBUG_PRINTING
     printf("Successfully deleted inventory\n");
-#endif
+    #endif
 }
 
 #pragma endregion
@@ -64,46 +60,48 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount, bool& success)
 {
     success = false;
 
-    if (static_cast<int>(items->size()) == newSlotCount)
+    if (newSlotCount < 1) return;
+
+    if (GetInventorySize() == newSlotCount)
     {
-#ifdef DEBUG_PRINTING
+        #ifdef DEBUG_PRINTING
         printf("inventory size = new slot count. no inventory size changes.\n");
-#endif
+        #endif
 
         success = true;
         return;
     }
 
-    if (static_cast<int>(items->size()) < newSlotCount)
+    if (GetInventorySize() < newSlotCount)
     {
-        const int amountToAdd = newSlotCount - static_cast<int>(items->size());
+        const int amountToAdd = newSlotCount - GetInventorySize();
 
-#ifdef DEBUG_PRINTING
-        const int originalSize = static_cast<int>(items->size());
+        #ifdef DEBUG_PRINTING
+        const int originalSize = GetInventorySize();
         printf("Trying to add %i slots to inventory with %i slots.\n",amountToAdd, originalSize);
-#endif
+        #endif
 
         for (int i = 0; i < amountToAdd; i++)
         {
             items->push_back(nullptr);
         }
 
-#ifdef DEBUG_PRINTING
-        printf("successfully changed inventory size from %i to %i.\n", originalSize, static_cast<int>(items->size()));
-#endif
+        #ifdef DEBUG_PRINTING
+        printf("successfully changed inventory size from %i to %i.\n", originalSize, GetInventorySize());
+        #endif
 
         success = true;
     }
 
-    else if (static_cast<int>(items->size()) > newSlotCount)
+    else if (GetInventorySize() > newSlotCount)
     {
         bool canShrink = true;
-        const int amountToRemove = static_cast<int>(items->size()) - newSlotCount;
+        const int amountToRemove = GetInventorySize() - newSlotCount;
 
-#ifdef DEBUG_PRINTING
-        const int originalSize = static_cast<int>(items->size());
+        #ifdef DEBUG_PRINTING
+        const int originalSize = GetInventorySize();
         printf("Trying to remove %i slots from inventory with %i slots.\n", amountToRemove, originalSize);
-#endif
+        #endif
 
         for(int i = newSlotCount-1; i < static_cast<int>(items->size()); i++)
         {
@@ -111,18 +109,18 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount, bool& success)
             if (!canShrink) return;
         }
 
-#ifdef DEBUG_PRINTING
+        #ifdef DEBUG_PRINTING
         printf("Slots to remove are empty. Progressing to removing slots.\n");
-#endif
+        #endif
 
         for(int i = 0; i < amountToRemove; i++)
         {
             items->pop_back();
         }
 
-#ifdef DEBUG_PRINTING
-        printf("Slot count successfully shrank from %i to %i.\n", originalSize, static_cast<int>(items->size()));
-#endif
+        #ifdef DEBUG_PRINTING
+        printf("Slot count successfully shrank from %i to %i.\n", originalSize, GetInventorySize());
+        #endif
 
         success = true;
     }
@@ -134,8 +132,44 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount)
     SetSlotCount(newSlotCount, ignored);
 }
 
-InventoryLib::BaseItem* InventoryLib::Inventory::GetItemBySlot(int slot)
+void InventoryLib::Inventory::AddItem(BaseItem* item)
 {
-    //TODO
+    bool ignored;
+    AddItem(item, ignored);
+}
+
+void InventoryLib::Inventory::AddItem(BaseItem* item, int slot)
+{
+    bool ignored;
+    AddItem(item, slot, ignored);
+}
+
+void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
+{
+    success = false;
+    for (const BaseItem* slotItem : items)
+    {
+        if(slotItem == nullptr)
+        {
+            slotItem = item;
+            success = true;
+            return;
+        }
+    }
+}
+
+void InventoryLib::Inventory::AddItem(BaseItem* item, int slot, bool& success)
+{
+    success = false;
+    if (slot >= GetInventorySize() || slot < 0) return;
+    if (items->at(slot) != nullptr) return;
+
+    items->at(slot) = item;
+    success = true;
+}
+
+InventoryLib::BaseItem* InventoryLib::Inventory::GetItemBySlot(int slot) const
+{
+    if (slot >= GetInventorySize() || slot < 0) return nullptr;
     return nullptr;
 }

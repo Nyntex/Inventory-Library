@@ -15,10 +15,8 @@ namespace InventoryLib
         virtual ~Inventory();
 
 #pragma region Member
-    private:
-        int slotCount = -1;             // -1 to deactivate slot count
-
-        float weight = -1.0f;           // -1 to deactivates weight
+    private: 
+        float maxWeight = -1.0f;        // -1 to deactivates maxWeight
 
         std::vector<BaseItem*>* items;  // using std::vector as I don't know if the vector might grow or not
 
@@ -29,7 +27,29 @@ namespace InventoryLib
     public:
         virtual void SetSlotCount(int newSlotCount, bool& success);
         virtual void SetSlotCount(int newSlotCount);
-        virtual BaseItem* GetItemBySlot(int slot);
+
+        //consider adding functionality to this
+        virtual void AddItem(BaseItem* item);
+        virtual void AddItem(BaseItem* item, int slot);
+        virtual void AddItem(BaseItem* item, bool& success);
+        virtual void AddItem(BaseItem* item, int slot, bool& success);
+
+        virtual BaseItem* GetItemBySlot(int slot) const;
+
+        virtual int GetInventorySize() const
+        {
+            return static_cast<int>(items->size());
+        }
+
+        virtual bool IsInventoryFull() const
+        {
+            for (BaseItem* item : items)
+            {
+                if (item == nullptr) return false;
+            }
+
+            return true;
+        }
 
 #pragma endregion
         
