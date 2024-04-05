@@ -1,6 +1,2 @@
-﻿  pch.cpp
-  BaseItem.cpp
-  Inventory.cpp
-  InventoryLib.cpp
-  Generating Code...
+﻿  Inventory.cpp
   InventoryLib.vcxproj -> C:\Users\Nyntex\Desktop\Final Exam\Inventory-Library\x64\Debug\InventoryLib.lib
