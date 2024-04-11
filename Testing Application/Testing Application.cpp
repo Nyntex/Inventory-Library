@@ -47,23 +47,36 @@ int main()
     inv->AddItem(new InventoryLib::BaseItem(*randomItem1));
     //printf("\n");
 
-    for(int i = 0; i < inv->GetInventorySize(); i++)
+    for(int i = 0; i < 20; i++)
+    {
+        InventoryLib::BaseItem* tempItem = new InventoryLib::BaseItem(*randomItem1);
+        tempItem->currentStack = 64;
+        tempItem->name = "";
+        tempItem->name += char((rand() % 26) + 65);
+        tempItem->name += char((rand() % 26) + 65);
+        tempItem->name += char((rand() % 26) + 65);
+        tempItem->name += char((rand() % 26) + 65);
+        inv->AddItem(tempItem);
+        tempItem = new InventoryLib::BaseItem(*tempItem);
+        tempItem->currentStack = 32;
+        inv->AddItem(tempItem);
+    }
+
+    /*for (int i = 0; i < 5; i++)
     {
         InventoryLib::BaseItem* tempItem = new InventoryLib::BaseItem(*randomItem1);
         tempItem->currentStack = rand() % 20;
-        inv->AddItem(tempItem);
-        //inv->AddItem(new InventoryLib::BaseItem(*randomItem2));
-        //printf("\n");
-        //std::cin.get();
-    }
+        inv->AddItem(tempItem, (rand()%50)+6);
+    }*/
 
-    //for (int i = 0; i < inv->GetInventorySize(); i++)
-    {
-        inv->RemoveItem(new InventoryLib::BaseItem(*randomItem1), 100);
-    }
+    printf(inv->GetInventoryStructure().c_str());
+    inv->SortByName();
+    printf(inv->GetInventoryStructure().c_str());
 
-    int* ignored;
-    printf("Does the inventory contain the item? : %s\n", inv->HasItem(new InventoryLib::BaseItem(*randomItem1), ignored, 64) ? "True" : "False");
+    //inv->RemoveItem(new InventoryLib::BaseItem(*randomItem1), 100);
+    
 
-    //printf(inv->GetInventoryStructure().c_str());
+    //int* ignored;
+    //printf("Does the inventory contain the item? : %s\n", inv->HasItem(new InventoryLib::BaseItem(*randomItem1), ignored, 64) ? "True" : "False");
+
 }

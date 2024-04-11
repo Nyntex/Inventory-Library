@@ -43,17 +43,18 @@ namespace InventoryLib
         virtual void RemoveItem(int slot, BaseItem*& removedItem);
         virtual void RemoveItem(int slot, bool& success, BaseItem*& removedItem);
 
-        virtual void SortNameUp();
-        virtual void SortNameDown();
-        virtual void SortTagUp();
-        virtual void SortTagDown();
-        virtual void SortStackUp();
-        virtual void SortStackDown();
+        virtual void SortByName(bool atoz = true);
+        //virtual void SortByTag(bool up = true);
+        //virtual void SortByStack(bool up = true);
 
         virtual std::string GetInventoryStructure();
 
         virtual int FindItem(BaseItem* item, bool allowFullStacks = true);
         virtual bool HasItem(BaseItem* item, int*& slots, int amount = 1);
+
+        bool IsStringGreater(const std::string& first, const std::string& second, int pos = 0);
+
+        std::string MakeStringUpperCase(const std::string& word);
 
         virtual BaseItem* GetItemInSlot(int slot) const;
 

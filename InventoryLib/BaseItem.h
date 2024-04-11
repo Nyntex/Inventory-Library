@@ -25,7 +25,12 @@ namespace InventoryLib
 
         virtual bool operator== (const BaseItem& rhs)
         {
-            return ID == rhs.ID;
+            return ID == rhs.ID && name == rhs.name && tag == rhs.tag;
+        }
+
+        virtual bool operator!= (const BaseItem& rhs)
+        {
+            return !(ID == rhs.ID);
         }
 
         virtual bool operator< (const BaseItem& rhs)
