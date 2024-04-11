@@ -53,6 +53,7 @@ namespace InventoryLib
         virtual std::string GetInventoryStructure();
 
         virtual int FindItem(BaseItem* item, bool allowFullStacks = true);
+        virtual bool HasItem(BaseItem* item, int*& slots, int amount = 1);
 
         virtual BaseItem* GetItemInSlot(int slot) const;
 

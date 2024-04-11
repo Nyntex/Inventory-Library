@@ -11,23 +11,20 @@
       "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\Inventory.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\BaseItem.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{5DF2F456-68B7-433A-A560-E2B990A23358}|Testing Application\\Testing Application.vcxproj|C:\\USERS\\NYNTEX\\DESKTOP\\FINAL EXAM\\INVENTORY-LIBRARY\\INVENTORYLIB\\INVENTORY.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{5DF2F456-68B7-433A-A560-E2B990A23358}|Testing Application\\Testing Application.vcxproj|solutionrelative:INVENTORYLIB\\INVENTORY.H||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\BaseItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\Inventory.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\BaseItem.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\macros.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\macros.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\xstring||{3B902123-F8A7-4915-9F01-361F908088D0}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -37,51 +34,40 @@
       "DocumentGroups": [
         {
           "DockedWidth": 201,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "BaseItem.h",
               "DocumentMoniker": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.h",
               "RelativeDocumentMoniker": "InventoryLib\\BaseItem.h",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.h",
               "RelativeToolTip": "InventoryLib\\BaseItem.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAADMAAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-04-04T14:14:01.419Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "Inventory.h",
               "DocumentMoniker": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.h",
               "RelativeDocumentMoniker": "InventoryLib\\Inventory.h",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.h",
               "RelativeToolTip": "InventoryLib\\Inventory.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAARAAAA",
+              "ViewState": "AQIAABUAAAAAAAAAAAAAADcAAAAyAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-04-04T14:13:09.051Z"
+              "WhenOpened": "2024-04-04T14:13:09.051Z",
+              "EditorCaption": ""
             }
           ]
         },
         {
           "DockedWidth": 199,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "xstring",
-              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\xstring",
-              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\xstring",
-              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\xstring",
-              "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\xstring",
-              "ViewState": "AQIAADQTAAAAAAAAAAAowFITAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-04-10T12:11:14.913Z"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 5,
@@ -90,9 +76,10 @@
               "RelativeDocumentMoniker": "InventoryLib\\macros.h",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\macros.h",
               "RelativeToolTip": "InventoryLib\\macros.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAbAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-04-08T09:38:15.716Z"
+              "WhenOpened": "2024-04-08T09:38:15.716Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -102,7 +89,7 @@
               "RelativeDocumentMoniker": "InventoryLib\\Inventory.cpp",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.cpp",
               "RelativeToolTip": "InventoryLib\\Inventory.cpp",
-              "ViewState": "AQIAAIkAAAAAAAAAAAAAAJ4AAABAAAAA",
+              "ViewState": "AQIAANABAAAAAAAAAAAwwPIBAAAzAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-04-04T14:14:44.959Z",
               "EditorCaption": ""
@@ -128,7 +115,7 @@
               "RelativeDocumentMoniker": "Testing Application\\Testing Application.cpp",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\Testing Application\\Testing Application.cpp",
               "RelativeToolTip": "Testing Application\\Testing Application.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB8AAAAbAAAA",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAAADgAAAAZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-04-05T09:32:47.548Z",
               "EditorCaption": ""

@@ -56,6 +56,11 @@ namespace InventoryLib
 
             return validity;
         }
+
+        virtual bool IsStackFull()
+        {
+            return stackSize == currentStack;
+        }
     };
 }
 

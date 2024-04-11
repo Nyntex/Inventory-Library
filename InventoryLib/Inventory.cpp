@@ -6,7 +6,9 @@
 #pragma region De/Constructors
 InventoryLib::Inventory::Inventory()
 {
-    DEBUGPRINT("--- !!! --- \n THIS IS THE DEBUG BUILD, EXPECT MANY LOG OUTPUTS\n--- !!! --- \n")
+    #ifdef _DEBUG
+    printf("--- !!! --- \n THIS IS THE DEBUG BUILD, EXPECT MANY LOG OUTPUTS\n--- !!! --- \n");
+    #endif
     this->maxWeight = -1;
     this->items = new std::vector<BaseItem*>();
 }
@@ -154,12 +156,17 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
         #endif
         return;
     }
+    if(!item->IsValid())
+    {
+        #ifdef _DEBUG
+        printf("Invalid item input to add to inventory!\n");
+        #endif
+        return;
+    }
 
     #ifdef _DEBUG
     printf(("[Adding item with ID: " + item->ID + "]").c_str());
     #endif
-
-    int totalToAdd = item->currentStack;
 
     for(int i = 0; i < GetInventorySize(); i++)
     {
@@ -168,23 +175,29 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
         {
             if (items->at(i)->currentStack < items->at(i)->stackSize)
             {
-                if(items->at(i)->stackSize - items->at(i)->currentStack >= totalToAdd)
+                if(items->at(i)->stackSize - items->at(i)->currentStack >= item->currentStack)
                 {
-                    items->at(i)->currentStack += totalToAdd;
+                    items->at(i)->currentStack += item->currentStack;
                     success = true;
 
                     #ifdef _DEBUG
-                    printf("Added %i to stack in slot %i. Went from %i to %i.\n", totalToAdd, i, items->at(i)->currentStack - totalToAdd, items->at(i)->currentStack);
+                    printf("Added %i to stack in slot %i. Went from %i to %i.", item->currentStack, i, items->at(i)->currentStack - item->currentStack, items->at(i)->currentStack);
+                    if(items->at(i)->currentStack == items->at(i)->stackSize)
+                    {
+                        printf("Slot %i is maxed out now.", i);
+                    }
+                    printf("\n");
                     #endif
                     return;
                 }
                 else
                 {
-                    totalToAdd -= items->at(i)->stackSize - items->at(i)->currentStack;
+                    int added = item->currentStack;
+                    item->currentStack -= items->at(i)->stackSize - items->at(i)->currentStack;
                     items->at(i)->currentStack = items->at(i)->stackSize;
 
                     #ifdef _DEBUG
-                    printf("Maxed out items in slot %i. Total to add is now %i.\n", i, totalToAdd);
+                    printf("Added %i to stack in slot %i. Maxed it. Total to add is now %i.\n", added, i, item->currentStack);
                     #endif
                 }
             }
@@ -300,17 +313,25 @@ void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount, bool& succe
 {
     success = false;
 
-    std::vector<BaseItem*>* itemsToRemove = new std::vector<BaseItem*>();
+    if(item == nullptr)
+    {
+        #ifdef _DEBUG
+        printf("Invalid item input to remove from inventory!\n");
+        #endif
+        return;
+    }
+
+    std::vector<int>* itemsToRemove = new std::vector<int>();
     int totalCount = 0;
 
-    for (BaseItem* invItem : *items)
+    for(int i = 0; i < GetInventorySize(); i++)
     {
-        if (invItem == nullptr) continue;
+        if (items->at(i) == nullptr) continue;
 
-        if (*invItem == *item)
+        if (*items->at(i) == *item)
         {
-            totalCount += invItem->currentStack;
-            itemsToRemove->push_back(invItem);
+            totalCount += items->at(i)->currentStack;
+            itemsToRemove->push_back(i);
         }
     }
 
@@ -321,19 +342,27 @@ void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount, bool& succe
         #endif
     }
 
-    for (BaseItem* removable : *itemsToRemove)
+    for (const int removableSlot : *itemsToRemove)
     {
-        if(removable->currentStack >= amount)
+        if(items->at(removableSlot)->currentStack >= amount)
         {
-            removable->currentStack -= amount;
+            #ifdef _DEBUG
+            printf("Removed %i items from stack in slot %i. Went from %i to %i.\n", amount, removableSlot, items->at(removableSlot)->currentStack, items->at(removableSlot)->currentStack - amount);
+            #endif
+            items->at(removableSlot)->currentStack -= amount;
             success = true;
             return;
         }
 
-        if(removable->currentStack < amount)
+        if(items->at(removableSlot)->currentStack < amount)
         {
-            amount -= removable->currentStack;
-            removable = nullptr;
+            amount -= items->at(removableSlot)->currentStack;
+            delete items->at(removableSlot);
+            items->at(removableSlot) = nullptr;
+
+            #ifdef _DEBUG
+            printf("Removed the whole stack in slot %i. \n", removableSlot);
+            #endif
         }
     }
 }
@@ -370,6 +399,14 @@ void InventoryLib::Inventory::RemoveItem(int slot, bool& success, BaseItem*& rem
     {
         #ifdef _DEBUG
         printf("Item in slot %i is already empty", slot);
+        #endif
+        return;
+    }
+
+    if (!items->at(slot)->IsValid())
+    {
+        #ifdef _DEBUG
+        printf("Item in slot %i is invalid", slot);
         #endif
         return;
     }
@@ -415,7 +452,8 @@ std::string InventoryLib::Inventory::GetInventoryStructure()
 
     for(int i =0; i < GetInventorySize(); i++)
     {
-        if (!items->at(i)) continue;
+        if (items->at(i) == nullptr) continue;
+        if (!items->at(i)->IsValid()) continue;
 
         retVal += "{\n";
 
@@ -443,7 +481,7 @@ int InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks)
         {
             if(!allowFullStacks && item != nullptr)
             {
-                if(items->at(i)->currentStack == items->at(i)->stackSize)
+                if(items->at(i)->IsStackFull())
                 {
                     continue;
                 }
@@ -451,8 +489,30 @@ int InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks)
             return i;
         }
     }
-
     return -1;
+}
+
+bool InventoryLib::Inventory::HasItem(BaseItem* item, int*& slots, int amount)
+{
+    if (!item) return false;
+
+    std::vector<int> slotsWithItem = std::vector<int>();
+    int count = 0;
+
+    for(int i = 0; i< GetInventorySize(); i++)
+    {
+        if (items->at(i) == nullptr) continue;
+
+        if(*items->at(i) == *item)
+        {
+            slotsWithItem.push_back(i);
+            count += items->at(i)->currentStack;
+        }
+    }
+
+    slots = slotsWithItem.data();
+
+    return (count >= amount && !slotsWithItem.empty());
 }
 
 
