@@ -44,14 +44,16 @@ int main()
     InventoryLib::BaseItem* randomItem2 = new InventoryLib::BaseItem("Ralf", "Weapon", "000021-00021-000021", 64, 4);
     printf("Created Item \"Ralf\"\n");
 
-    inv->AddItem(randomItem1);
-    printf("\n");
+    inv->AddItem(new InventoryLib::BaseItem(*randomItem1));
+    //printf("\n");
 
     for(int i = 0; i < inv->GetInventorySize(); i++)
     {
-        inv->AddItem(randomItem2);
-        printf("\n");
+        inv->AddItem(new InventoryLib::BaseItem(*randomItem2));
+        inv->AddItem(new InventoryLib::BaseItem(*randomItem1));
+        //printf("\n");
+        //std::cin.get();
     }
 
-    printf(inv->GetInventoryStructure().c_str());
+    //printf(inv->GetInventoryStructure().c_str());
 }

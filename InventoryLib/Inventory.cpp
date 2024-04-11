@@ -150,28 +150,42 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
     if (item == nullptr)
     {
         #ifdef _DEBUG
-        printf("Invalid item input to add to inventory!");
+        printf("Invalid item input to add to inventory!\n");
         #endif
         return;
     }
-    
-    for (BaseItem* slotItem : *items)
+
+    #ifdef _DEBUG
+    printf(("[Adding item with ID: " + item->ID + "]").c_str());
+    #endif
+
+    int totalToAdd = item->currentStack;
+
+    for(int i = 0; i < GetInventorySize(); i++)
     {
-        if (slotItem == nullptr) continue;
-        if (*slotItem == *item)
+        if (items->at(i) == nullptr) continue;
+        if (*items->at(i) == *item)
         {
-            if (slotItem->currentStack < slotItem->stackSize)
+            if (items->at(i)->currentStack < items->at(i)->stackSize)
             {
-                if(slotItem->stackSize - slotItem->currentStack >= item->currentStack)
+                if(items->at(i)->stackSize - items->at(i)->currentStack >= totalToAdd)
                 {
-                    slotItem->currentStack += item->currentStack;
+                    items->at(i)->currentStack += totalToAdd;
                     success = true;
+
+                    #ifdef _DEBUG
+                    printf("Added %i to stack in slot %i. Went from %i to %i.\n", totalToAdd, i, items->at(i)->currentStack - totalToAdd, items->at(i)->currentStack);
+                    #endif
                     return;
                 }
                 else
                 {
-                    item->currentStack -= slotItem->stackSize - slotItem->currentStack;
-                    slotItem->currentStack = slotItem->stackSize;
+                    totalToAdd -= items->at(i)->stackSize - items->at(i)->currentStack;
+                    items->at(i)->currentStack = items->at(i)->stackSize;
+
+                    #ifdef _DEBUG
+                    printf("Maxed out items in slot %i. Total to add is now %i.\n", i, totalToAdd);
+                    #endif
                 }
             }
         }
@@ -181,7 +195,7 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
     if(availableSlot == -1)
     {
         #ifdef _DEBUG
-        printf("No space to add item");
+        printf("No space to add item.\n");
         #endif
         return;
     }
@@ -189,7 +203,7 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
     items->at(availableSlot) = item;
     success = true;
     #ifdef _DEBUG
-    printf("Item was successfully added to a new slot (%i)", availableSlot);
+    printf("Item was successfully added to a new slot (%i).\n", availableSlot);
     #endif
 }
 
