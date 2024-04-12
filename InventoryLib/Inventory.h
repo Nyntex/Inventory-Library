@@ -33,7 +33,6 @@ namespace InventoryLib
         virtual void AddItem(BaseItem* item, bool& success);
         virtual void AddItem(BaseItem* item, int slot, bool& success);
 
-
         virtual void RemoveItem(BaseItem* item);
         virtual void RemoveItem(BaseItem* item, int amount);
         virtual void RemoveItem(BaseItem* item, bool& success);
@@ -44,10 +43,10 @@ namespace InventoryLib
         virtual void RemoveItem(int slot, bool& success, BaseItem*& removedItem);
 
         virtual void SortByName(bool atoz = true);
-        //virtual void SortByTag(bool up = true);
-        //virtual void SortByStack(bool up = true);
+        virtual void SortByTag(bool atoz = true);
+        virtual void SortByStack(bool highToLow = true);
 
-        virtual std::string GetInventoryStructure();
+        virtual std::string GetInventoryStructure(bool readable = true);
 
         virtual int FindItem(BaseItem* item, bool allowFullStacks = true);
         virtual bool HasItem(BaseItem* item, int*& slots, int amount = 1);
@@ -73,6 +72,10 @@ namespace InventoryLib
             return true;
         }
 
+    private:
+        void Sort(bool (*comparison)(Inventory*,int,int,bool), bool up);
+
+        void Reorder(int pos, int pos2);
 #pragma endregion
         
     };

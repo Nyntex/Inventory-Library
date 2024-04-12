@@ -6,7 +6,7 @@ InventoryLib::BaseItem::BaseItem()
 }
 
 InventoryLib::BaseItem::BaseItem(BaseItem& other)
-    :ID(other.ID), stackSize(other.stackSize)
+    : ID(other.ID), tag(other.tag), stackSize(other.stackSize)
 {
     name = other.name;
     currentStack = other.currentStack;

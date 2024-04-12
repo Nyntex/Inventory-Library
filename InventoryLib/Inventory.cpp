@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Inventory.h"
 #include <iostream>
+#include <windows.h>
+
 #include "macros.h"
 
 #pragma region De/Constructors
@@ -437,83 +439,188 @@ void InventoryLib::Inventory::SortByName(bool atoz)
         {
             if (items->at(j) == nullptr)
             {
-                items->at(j) = items->at(j + 1);
-                items->at(j+1) = nullptr;
+                Reorder(j, j + 1);
                 continue;
             }
             if (items->at(j + 1) == nullptr) continue;
 
             if(atoz)
             {
-                if (!IsStringGreater(items->at(j)->name, items->at(j+1)->name))
-                {
-                    BaseItem* temp = items->at(j);
-                    items->at(j) = items->at(j + 1);
-                    items->at(j+1) = temp;
-                    continue;
-                }
-
                 if (items->at(j)->name == items->at(j+1)->name)
                 {
                     if (items->at(j)->currentStack < items->at(j+1)->currentStack)
                     {
-                        BaseItem* temp = items->at(j);
-                        items->at(j) = items->at(j + 1);
-                        items->at(j+1) = temp;
+                        Reorder(j, j + 1);
                     }
                 }
+
+                if (IsStringGreater(items->at(j)->name, items->at(j+1)->name))
+                {
+                    Reorder(j, j + 1);
+                    continue;
+                }
+
             }
             else
             {
-                if (IsStringGreater(items->at(j)->name, items->at(j + 1)->name))
-                {
-                    BaseItem* temp = items->at(j);
-                    items->at(j) = items->at(j + 1);
-                    items->at(j+1) = temp;
-                    break;
-                }
-
                 if (items->at(j)->name == items->at(j + 1)->name)
                 {
-                    if (items->at(j)->currentStack > items->at(j + 1)->currentStack)
+                    if (items->at(j)->currentStack < items->at(j + 1)->currentStack)
                     {
-                        BaseItem* temp = items->at(j);
-                        items->at(j) = items->at(j + 1);
-                        items->at(j+1) = temp;
+                        Reorder(j, j + 1);
                         break;
                     }
                 }
+
+                if (!IsStringGreater(items->at(j)->name, items->at(j + 1)->name))
+                {
+                    Reorder(j, j + 1);
+                    break;
+                }
+
             }
         }
     }
 }
 
+void InventoryLib::Inventory::SortByTag(bool atoz) //first tries to sort by tag name, than by name and than by stack size
+{
+    //bubble sort
+    auto sorting = [](Inventory* inv, int j, int b, bool atoz) -> bool
+    {
+            if (inv->items->at(j) == nullptr)
+            {
+                return true;
+            }
+            if (inv->items->at(j + 1) == nullptr) return false;
+
+            if (atoz)
+            {
+                if (inv->items->at(j)->tag == inv->items->at(j + 1)->tag)
+                {
+                    if (inv->items->at(j)->name == inv->items->at(j + 1)->name &&
+                        inv->items->at(j)->currentStack < inv->items->at(j + 1)->currentStack)
+                    {
+                        return true;
+                    }
+                }
+
+                if (inv->IsStringGreater(inv->items->at(j)->tag, inv->items->at(j + 1)->tag))
+                {
+                    return true;
+                }
+
+            }
+            else
+            {
+                if (inv->items->at(j)->tag == inv->items->at(j + 1)->tag)
+                {
+                    if (inv->items->at(j)->name == inv->items->at(j + 1)->name &&
+                        inv->items->at(j)->currentStack < inv->items->at(j + 1)->currentStack)
+                    {
+                        return true;
+                    }
+                }
+
+                if (!inv->IsStringGreater(inv->items->at(j)->tag, inv->items->at(j + 1)->tag))
+                {
+                    return true;
+                }
+
+            }
+            return false;
+    };
+
+    Sort(sorting, atoz);
+}
+
+void InventoryLib::Inventory::SortByStack(bool highToLow)
+{
+    auto reorder = [](std::vector<BaseItem*>*& itemList, int pos) -> void
+        {
+            BaseItem* temp = itemList->at(pos);
+            itemList->at(pos) = itemList->at(pos + 1);
+            itemList->at(pos + 1) = temp;
+        };
+
+    for (int i = 1; i < GetInventorySize(); i++)
+    {
+        for (int j = 0; j < GetInventorySize() - i; j++)
+        {
+            if (items->at(j) == nullptr)
+            {
+                reorder(items, j);
+                continue;
+            }
+            if (items->at(j + 1) == nullptr) continue;
+
+            if(highToLow)
+            {
+                if (items->at(j)->currentStack == items->at(j + 1)->currentStack)
+                {
+                    if (items->at(j)->name == items->at(j + 1)->name &&
+                        items->at(j)->currentStack < items->at(j + 1)->currentStack)
+                    {
+                        reorder(items, j);
+                        continue;
+                    }
+
+                    if (IsStringGreater(items->at(j)->name, items->at(j + 1)->name))
+                    {
+                        reorder(items, j);
+                        continue;
+                    }
+                }
+
+                if(items->at(j)->currentStack > items->at(j + 1)->currentStack)
+                {
+                    
+                }
+            }
+            else
+            {
+                
+            }
+        }
+
+    }
+}
 
 
-std::string InventoryLib::Inventory::GetInventoryStructure()
+std::string InventoryLib::Inventory::GetInventoryStructure(bool readable)
 {
     std::string retVal = "";
 
-    for(int i =0; i < GetInventorySize(); i++)
+    for (int i = 0; i < GetInventorySize(); i++)
     {
         if (items->at(i) == nullptr) continue;
         if (!items->at(i)->IsValid()) continue;
 
-        retVal += "{\n";
+        if (readable)
+        {
+            retVal += "{\n";
 
-        retVal += "\tItemID:" + items->at(i)->ID + ":\n";
-        retVal += "\t{\n";
+            retVal += "\tItemID:" + items->at(i)->ID + ":\n" + 
+                "\t{\n";
 
-        retVal += "\t\tName:" + items->at(i)->name + ";\n";
-        retVal += "\t\tTag:" + items->at(i)->tag + ";\n";
-        retVal += "\t\tStackSize:" + std::to_string(items->at(i)->stackSize) + ";\n";
-        retVal += "\t\tCurrentStack:" + std::to_string(items->at(i)->currentStack) + ";\n";
-        retVal += "\t\tSlot:" + std::to_string(i) + ";\n";
+            retVal += "\t\tName:" + items->at(i)->name + ";\n" + 
+                "\t\tTag:" + items->at(i)->tag + ";\n" + 
+                "\t\tStackSize:" + std::to_string(items->at(i)->stackSize) + ";\n" +
+                "\t\tCurrentStack:" + std::to_string(items->at(i)->currentStack) + ";\n" +
+                "\t\tSlot:" + std::to_string(i) + ";\n";
 
-        retVal += "\t}\n";
-        retVal += "}\n";
+            retVal += "\t}\n";
+            retVal += "}\n";
+        }
+        else
+        {
+            retVal += "{ItemID:" + items->at(i)->ID + ":";
+            retVal += "{Name:" + items->at(i)->name + ";Tag:" + items->at(i)->tag + 
+                ";StackSize:" + std::to_string(items->at(i)->stackSize) + 
+                ";CurrentStack" + std::to_string(items->at(i)->currentStack) +
+                ";Slot:" + std::to_string(i) + ";}}\n";
+        }
     }
-
     return retVal;
 }
 
@@ -563,8 +670,8 @@ bool InventoryLib::Inventory::IsStringGreater(const std::string& first, const st
 {
     if (pos < 0) pos = 0;
 
-    std::string optimisedFirst;
-    std::string optimisedSecond;
+    std::string optimisedFirst = first;
+    std::string optimisedSecond = second;
 
     if(pos == 0) //optimise strings in first runthrough
     {
@@ -583,16 +690,7 @@ bool InventoryLib::Inventory::IsStringGreater(const std::string& first, const st
         return IsStringGreater(optimisedFirst, optimisedSecond, pos + 1);
     }
 
-    if(optimisedFirst[pos] >= 65 && optimisedFirst[pos] <= 90 && optimisedSecond[pos] >= 65 && optimisedSecond[pos] <= 90)
-    {
-        return optimisedFirst[pos] < optimisedSecond[pos];
-    }
-    else
-    {
-        return(optimisedFirst[pos] > optimisedSecond[pos]);
-    }
-
-    return false;
+    return(optimisedFirst[pos] > optimisedSecond[pos]);
 }
 
 std::string InventoryLib::Inventory::MakeStringUpperCase(const std::string& word)
@@ -634,3 +732,28 @@ InventoryLib::BaseItem* InventoryLib::Inventory::GetItemInSlot(int slot) const
 
     return items->at(slot);
 }
+
+
+void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, int, bool), bool up)
+{
+    for (int i = 1; i < GetInventorySize(); i++)
+    {
+        for (int j = 0; j < GetInventorySize() - i; j++)
+        {
+            if(comparison(this, j,j+1, up))
+            {
+                Reorder(j, j + 1);
+            }
+        }
+    }
+}
+
+void InventoryLib::Inventory::Reorder(int pos, int pos2)
+{
+    BaseItem* temp = items->at(pos);
+    items->at(pos) = items->at(pos2);
+    items->at(pos2) = temp;
+}
+
+
+

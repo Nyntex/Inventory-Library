@@ -15,9 +15,9 @@ namespace InventoryLib
 
         std::string name = "None";
 
-        const std::string tag = "None";
-
         const std::string ID = "000000-000000-000000";
+
+        const std::string tag = "None";
 
         const int stackSize = 64;
 
