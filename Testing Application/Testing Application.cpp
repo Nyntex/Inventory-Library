@@ -2,54 +2,41 @@
 #include "Inventory.h"
 
 
+InventoryLib::BaseItem* RandomItem()
+{
+    std::string randomTag = "";
+    for (int i = 0; i < 8; i++)
+    {
+        randomTag += char((rand() % 26) + 65);
+    }
+
+    std::string randomName = "";
+    for (int i = 0; i < 4; i++)
+    {
+        randomName += char((rand() % 26) + 65);
+    }
+
+    std::string randomID = "";
+    for (int i = 1; i < 21; i++)
+    {
+        if (i % 7 == 0)
+        {
+            randomID += "-";
+        }
+        else
+        {
+            randomID += char((rand() % 26) + 65);
+        }
+    }
+
+    int randomStackSize = rand() % 256;
+
+    InventoryLib::BaseItem* retVal = new InventoryLib::BaseItem(randomName, randomTag, randomID, randomStackSize, rand() % (randomStackSize / 2) + randomStackSize / 2);
+    return retVal;
+}
+
 int main()
 {
-    auto randomItem = []() -> InventoryLib::BaseItem*
-        {
-            std::string randomTag = "";
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-            randomTag += char((rand() % 26) + 65);
-
-            std::string randomName = "";
-            randomName += char((rand() % 26) + 65);
-            randomName += char((rand() % 26) + 65);
-            randomName += char((rand() % 26) + 65);
-            randomName += char((rand() % 26) + 65);
-
-            std::string randomID = "";
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += "-";
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += "-";
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-            randomID += char((rand() % 26) + 65);
-
-            int randomStackSize = rand() % 256;
-            
-            InventoryLib::BaseItem* retVal = new InventoryLib::BaseItem(randomName, randomTag, randomID, randomStackSize, rand() % (randomStackSize / 2) + randomStackSize / 2);
-            return retVal;
-        };
 
     printf("--- Creation and deletion of Inventory ---\n");
     if(false)
@@ -95,25 +82,10 @@ int main()
         inv = new InventoryLib::Inventory(100);
         printf("\n");
 
-        InventoryLib::BaseItem* randomItem1 = new InventoryLib::BaseItem("Otto", "Weapon", "000001-00001-000001", 64, 7);
-        printf("Created Item \"Otto\"\n");
-        InventoryLib::BaseItem* randomItem2 = new InventoryLib::BaseItem("Ralf", "Weapon", "000021-00021-000021", 64, 4);
-        printf("Created Item \"Ralf\"\n");
-
-        inv->AddItem(new InventoryLib::BaseItem(*randomItem1));
-        //printf("\n");
-
-
         //Testing Sort by name
         for (int i = 0; i < 20; i++)
         {
-            InventoryLib::BaseItem* tempItem = new InventoryLib::BaseItem(*randomItem1);
-            tempItem->currentStack = 64;
-            tempItem->name = "";
-            tempItem->name += char((rand() % 26) + 65);
-            tempItem->name += char((rand() % 26) + 65);
-            tempItem->name += char((rand() % 26) + 65);
-            tempItem->name += char((rand() % 26) + 65);
+            InventoryLib::BaseItem* tempItem = RandomItem();
             inv->AddItem(tempItem);
             tempItem = new InventoryLib::BaseItem(*tempItem);
             tempItem->currentStack = 32;
@@ -132,26 +104,15 @@ int main()
     }
 
     printf("--- Testing Sort by Tag ---\n");
-    if(false)
+    if (false)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
-        inv = new InventoryLib::Inventory(100);
         printf("\n");
-
-        InventoryLib::BaseItem* randomItem1 = new InventoryLib::BaseItem("Otto", "Weapon", "000001-00001-000001", 64, 7);
-        printf("Created Item \"Otto\"\n");
-        InventoryLib::BaseItem* randomItem2 = new InventoryLib::BaseItem("Ralf", "Weapon", "000021-00021-000021", 64, 4);
-        printf("Created Item \"Ralf\"\n");
-
-        inv->AddItem(new InventoryLib::BaseItem(*randomItem1));
-        //printf("\n");
-
 
         //Testing Sort by name
         for (int i = 0; i < 40; i++)
         {
-            InventoryLib::BaseItem* tempItem = randomItem();
-
+            InventoryLib::BaseItem* tempItem = RandomItem();
             inv->AddItem(tempItem);
             tempItem = new InventoryLib::BaseItem(*tempItem);
             tempItem->currentStack = 50;
@@ -165,8 +126,8 @@ int main()
         printf("--- SORTED BY TAG ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
     }
-
-    printf("--- Testing Sort by Tag ---\n");
+    
+    printf("--- Testing Sort by Stack ---\n");
     if (true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
@@ -175,18 +136,20 @@ int main()
         //Testing Sort by name
         for (int i = 0; i < 40; i++)
         {
-            InventoryLib::BaseItem* tempItem = randomItem();
-            inv->AddItem(tempItem);
-            tempItem = new InventoryLib::BaseItem(*tempItem);
-            tempItem->currentStack = 50;
+            InventoryLib::BaseItem* tempItem = RandomItem();
+            tempItem->currentStack = rand()%200;
+            if(tempItem->currentStack > tempItem->stackSize)
+            {
+                tempItem->currentStack = tempItem->stackSize;
+            }
             inv->AddItem(tempItem);
         }
 
         printf("--- UNSORTED ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
-        inv->SortByTag();
+        inv->SortByStack();
         printf("\n\n\n");
-        printf("--- SORTED BY TAG ---\n");
+        printf("--- SORTED BY STACK ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
     }
 

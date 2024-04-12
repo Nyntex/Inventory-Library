@@ -432,101 +432,77 @@ void InventoryLib::Inventory::RemoveItem(int slot, bool& success, BaseItem*& rem
 
 void InventoryLib::Inventory::SortByName(bool atoz)
 {
-    //bubble-sort
-    for(int i = 1; i < GetInventorySize(); i++)
-    {
-        for(int j = 0; j < GetInventorySize()-i; j++)
+    auto sorting = [](Inventory* inv, int slotPos, bool atoz) -> bool
         {
-            if (items->at(j) == nullptr)
+            if (inv->items->at(slotPos) == nullptr)
             {
-                Reorder(j, j + 1);
-                continue;
+                return true;
             }
-            if (items->at(j + 1) == nullptr) continue;
+            if (inv->items->at(slotPos + 1) == nullptr) return false;
 
-            if(atoz)
+            if (inv->items->at(slotPos)->name == inv->items->at(slotPos + 1)->name)
             {
-                if (items->at(j)->name == items->at(j+1)->name)
+                if (inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
                 {
-                    if (items->at(j)->currentStack < items->at(j+1)->currentStack)
-                    {
-                        Reorder(j, j + 1);
-                    }
+                    return true;
                 }
+            }
 
-                if (IsStringGreater(items->at(j)->name, items->at(j+1)->name))
+            if (atoz)
+            {
+                if (inv->IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
                 {
-                    Reorder(j, j + 1);
-                    continue;
+                    return true;
                 }
-
             }
             else
             {
-                if (items->at(j)->name == items->at(j + 1)->name)
+                if (!inv->IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
                 {
-                    if (items->at(j)->currentStack < items->at(j + 1)->currentStack)
-                    {
-                        Reorder(j, j + 1);
-                        break;
-                    }
+                    return true;
                 }
-
-                if (!IsStringGreater(items->at(j)->name, items->at(j + 1)->name))
-                {
-                    Reorder(j, j + 1);
-                    break;
-                }
-
             }
-        }
-    }
+
+            return false;
+        };
+
+    Sort(sorting, atoz);
 }
 
 void InventoryLib::Inventory::SortByTag(bool atoz) //first tries to sort by tag name, than by name and than by stack size
 {
     //bubble sort
-    auto sorting = [](Inventory* inv, int j, int b, bool atoz) -> bool
+    auto sorting = [](Inventory* inv, int slotPos, bool atoz) -> bool
     {
-            if (inv->items->at(j) == nullptr)
+            if (inv->items->at(slotPos) == nullptr)
             {
                 return true;
             }
-            if (inv->items->at(j + 1) == nullptr) return false;
+            if (inv->items->at(slotPos + 1) == nullptr) return false;
+
+            if (inv->items->at(slotPos)->tag == inv->items->at(slotPos + 1)->tag)
+            {
+                if (inv->items->at(slotPos)->name == inv->items->at(slotPos + 1)->name &&
+                    inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
+                {
+                    return true;
+                }
+            }
 
             if (atoz)
             {
-                if (inv->items->at(j)->tag == inv->items->at(j + 1)->tag)
-                {
-                    if (inv->items->at(j)->name == inv->items->at(j + 1)->name &&
-                        inv->items->at(j)->currentStack < inv->items->at(j + 1)->currentStack)
-                    {
-                        return true;
-                    }
-                }
 
-                if (inv->IsStringGreater(inv->items->at(j)->tag, inv->items->at(j + 1)->tag))
+                if (inv->IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
                 {
                     return true;
                 }
-
             }
             else
             {
-                if (inv->items->at(j)->tag == inv->items->at(j + 1)->tag)
-                {
-                    if (inv->items->at(j)->name == inv->items->at(j + 1)->name &&
-                        inv->items->at(j)->currentStack < inv->items->at(j + 1)->currentStack)
-                    {
-                        return true;
-                    }
-                }
-
-                if (!inv->IsStringGreater(inv->items->at(j)->tag, inv->items->at(j + 1)->tag))
+                if (!inv->IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
                 {
                     return true;
                 }
-
             }
             return false;
     };
@@ -536,54 +512,48 @@ void InventoryLib::Inventory::SortByTag(bool atoz) //first tries to sort by tag 
 
 void InventoryLib::Inventory::SortByStack(bool highToLow)
 {
-    auto reorder = [](std::vector<BaseItem*>*& itemList, int pos) -> void
+    auto sorting = [](Inventory* inv, int slotPos, bool highToLow) -> bool
         {
-            BaseItem* temp = itemList->at(pos);
-            itemList->at(pos) = itemList->at(pos + 1);
-            itemList->at(pos + 1) = temp;
-        };
-
-    for (int i = 1; i < GetInventorySize(); i++)
-    {
-        for (int j = 0; j < GetInventorySize() - i; j++)
-        {
-            if (items->at(j) == nullptr)
+            if (inv->items->at(slotPos) == nullptr)
             {
-                reorder(items, j);
-                continue;
+                return true;
             }
-            if (items->at(j + 1) == nullptr) continue;
+            if (inv->items->at(slotPos + 1) == nullptr) return false;
 
-            if(highToLow)
+            if (inv->items->at(slotPos)->currentStack == inv->items->at(slotPos + 1)->currentStack)
             {
-                if (items->at(j)->currentStack == items->at(j + 1)->currentStack)
+                if (inv->items->at(slotPos)->name == inv->items->at(slotPos + 1)->name &&
+                    inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
                 {
-                    if (items->at(j)->name == items->at(j + 1)->name &&
-                        items->at(j)->currentStack < items->at(j + 1)->currentStack)
-                    {
-                        reorder(items, j);
-                        continue;
-                    }
-
-                    if (IsStringGreater(items->at(j)->name, items->at(j + 1)->name))
-                    {
-                        reorder(items, j);
-                        continue;
-                    }
+                    return true;
                 }
 
-                if(items->at(j)->currentStack > items->at(j + 1)->currentStack)
+                if (inv->IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
                 {
-                    
+                    return true;
+                }
+            }
+
+            if (highToLow)
+            {
+
+                if (inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
+                {
+                    return true;
                 }
             }
             else
             {
-                
+                if (inv->items->at(slotPos)->currentStack > inv->items->at(slotPos + 1)->currentStack)
+                {
+                    return true;
+                }
             }
-        }
 
-    }
+            return false;
+        };
+
+    Sort(sorting, highToLow);
 }
 
 
@@ -614,11 +584,11 @@ std::string InventoryLib::Inventory::GetInventoryStructure(bool readable)
         }
         else
         {
-            retVal += "{ItemID:" + items->at(i)->ID + ":";
-            retVal += "{Name:" + items->at(i)->name + ";Tag:" + items->at(i)->tag + 
-                ";StackSize:" + std::to_string(items->at(i)->stackSize) + 
-                ";CurrentStack" + std::to_string(items->at(i)->currentStack) +
-                ";Slot:" + std::to_string(i) + ";}}\n";
+            retVal += "{ItemID:" + items->at(i)->ID + ": ";
+            retVal += "{Name:" + items->at(i)->name + "; Tag:" + items->at(i)->tag + 
+                "; StackSize:" + std::to_string(items->at(i)->stackSize) + 
+                "; CurrentStack:" + std::to_string(items->at(i)->currentStack) +
+                "; Slot:" + std::to_string(i) + ";}}\n";
         }
     }
     return retVal;
@@ -734,13 +704,13 @@ InventoryLib::BaseItem* InventoryLib::Inventory::GetItemInSlot(int slot) const
 }
 
 
-void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, int, bool), bool up)
+void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, bool), bool up)
 {
     for (int i = 1; i < GetInventorySize(); i++)
     {
         for (int j = 0; j < GetInventorySize() - i; j++)
         {
-            if(comparison(this, j,j+1, up))
+            if(comparison(this, j, up))
             {
                 Reorder(j, j + 1);
             }

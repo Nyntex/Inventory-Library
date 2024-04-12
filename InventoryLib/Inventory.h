@@ -73,7 +73,7 @@ namespace InventoryLib
         }
 
     private:
-        void Sort(bool (*comparison)(Inventory*,int,int,bool), bool up);
+        void Sort(bool (*comparison)(Inventory*,int,bool), bool up);
 
         void Reorder(int pos, int pos2);
 #pragma endregion
