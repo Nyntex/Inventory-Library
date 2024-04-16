@@ -49,10 +49,13 @@ int main()
     }
 
     printf("--- Creation of inventory with slots and shrinking it ---\n");
-    if(false)
+    if(true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         bool success;
+        #ifdef _DEBUG
+        printf("-- Start shrinking --");
+        #endif
         inv->SetSlotCount(16, success);
         delete inv;
         printf("\n");
@@ -128,7 +131,7 @@ int main()
     }
     
     printf("--- Testing Sort by Stack ---\n");
-    if (true)
+    if (false)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         printf("\n");
@@ -147,7 +150,7 @@ int main()
 
         printf("--- UNSORTED ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
-        inv->SortByStack();
+        inv->SortByStack(false);
         printf("\n\n\n");
         printf("--- SORTED BY STACK ---\n");
         printf(inv->GetInventoryStructure(false).c_str());

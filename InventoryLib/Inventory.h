@@ -11,12 +11,14 @@ namespace InventoryLib
         Inventory();
         Inventory(int newSlotCount);
         Inventory(float newWeight);
-        Inventory(int newSlotCount, float newWeight);
+        Inventory(int newSlotCount, float newWeight, bool useMaxSlotCount = true, bool useWeight = true);
         virtual ~Inventory();
 
 #pragma region Member
     private: 
         float maxWeight = -1.0f;        // -1 deactivates maxWeight
+
+        int maxSlots = -1;
 
         std::vector<BaseItem*>* items;
 
@@ -42,9 +44,9 @@ namespace InventoryLib
         virtual void RemoveItem(int slot, BaseItem*& removedItem);
         virtual void RemoveItem(int slot, bool& success, BaseItem*& removedItem);
 
-        virtual void SortByName(bool atoz = true);
-        virtual void SortByTag(bool atoz = true);
-        virtual void SortByStack(bool highToLow = true);
+        virtual void SortByName(bool ascending = true);
+        virtual void SortByTag(bool ascending = true);
+        virtual void SortByStack(bool ascending = true);
 
         virtual std::string GetInventoryStructure(bool readable = true);
 
@@ -72,9 +74,10 @@ namespace InventoryLib
             return true;
         }
 
-    private:
-        void Sort(bool (*comparison)(Inventory*,int,bool), bool up);
+        //Takes a lambda function which is optimised for a bubble sort
+        virtual void Sort(bool (*comparison)(Inventory*,int,bool), bool ascending);
 
+    private:
         void Reorder(int pos, int pos2);
 #pragma endregion
         

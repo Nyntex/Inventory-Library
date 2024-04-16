@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5DF2F456-68B7-433A-A560-E2B990A23358}|Testing Application\\Testing Application.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\Testing Application\\Testing Application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{5DF2F456-68B7-433A-A560-E2B990A23358}|Testing Application\\Testing Application.vcxproj|solutionrelative:Testing Application\\Testing Application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\Inventory.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\Inventory.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\BaseItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{5DF2F456-68B7-433A-A560-E2B990A23358}|Testing Application\\Testing Application.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\Testing Application\\Testing Application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{5DF2F456-68B7-433A-A560-E2B990A23358}|Testing Application\\Testing Application.vcxproj|solutionrelative:Testing Application\\Testing Application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\Inventory.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|solutionrelative:InventoryLib\\BaseItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2470E311-242D-47AC-AA10-E02F8D519A0E}|InventoryLib\\InventoryLib.vcxproj|C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -49,18 +49,17 @@
               "RelativeToolTip": "InventoryLib\\BaseItem.h",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAAAdAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-04-04T14:14:01.419Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-04T14:14:01.419Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "Inventory.h",
               "DocumentMoniker": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.h",
               "RelativeDocumentMoniker": "InventoryLib\\Inventory.h",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.h",
               "RelativeToolTip": "InventoryLib\\Inventory.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAEsAAABEAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABgAAAARAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-04-04T14:13:09.051Z",
               "EditorCaption": ""
@@ -69,7 +68,7 @@
         },
         {
           "DockedWidth": 207,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
@@ -103,14 +102,14 @@
               "RelativeDocumentMoniker": "InventoryLib\\Inventory.cpp",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\Inventory.cpp",
               "RelativeToolTip": "InventoryLib\\Inventory.cpp",
-              "ViewState": "AQIAACICAAAAAAAAAAAEwEoCAAA5AAAA",
+              "ViewState": "AQIAACUAAAAAAAAAAADwv7kBAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-04-04T14:14:44.959Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "BaseItem.cpp",
               "DocumentMoniker": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\InventoryLib\\BaseItem.cpp",
               "RelativeDocumentMoniker": "InventoryLib\\BaseItem.cpp",
@@ -118,21 +117,19 @@
               "RelativeToolTip": "InventoryLib\\BaseItem.cpp",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAxAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-04-04T14:14:45.523Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-04T14:14:45.523Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "Testing Application.cpp",
               "DocumentMoniker": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\Testing Application\\Testing Application.cpp",
               "RelativeDocumentMoniker": "Testing Application\\Testing Application.cpp",
               "ToolTip": "C:\\Users\\Nyntex\\Desktop\\Final Exam\\Inventory-Library\\Testing Application\\Testing Application.cpp",
               "RelativeToolTip": "Testing Application\\Testing Application.cpp",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAGcAAAAFAAAA",
+              "ViewState": "AQIAAAMAAAAAAAAAAAAAAJEAAAA6AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-04-05T09:32:47.548Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-05T09:32:47.548Z"
             }
           ]
         }

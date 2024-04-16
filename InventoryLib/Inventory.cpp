@@ -35,7 +35,7 @@ InventoryLib::Inventory::Inventory(float newWeight)
     this->items = new std::vector<BaseItem*>();
 }
 
-InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight)
+InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, bool useMaxSlotCount, bool useWeight)
 {
     #ifdef _DEBUG
     printf("Creating inventory with %i slots and %f maxWeight.\n", newSlotCount, newWeight);
@@ -430,9 +430,9 @@ void InventoryLib::Inventory::RemoveItem(int slot, bool& success, BaseItem*& rem
 
 
 
-void InventoryLib::Inventory::SortByName(bool atoz)
+void InventoryLib::Inventory::SortByName(bool ascending)
 {
-    auto sorting = [](Inventory* inv, int slotPos, bool atoz) -> bool
+    auto sorting = [](Inventory* inv, int slotPos, bool ascending) -> bool
         {
             if (inv->items->at(slotPos) == nullptr)
             {
@@ -448,7 +448,7 @@ void InventoryLib::Inventory::SortByName(bool atoz)
                 }
             }
 
-            if (atoz)
+            if (ascending)
             {
                 if (inv->IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
                 {
@@ -466,13 +466,13 @@ void InventoryLib::Inventory::SortByName(bool atoz)
             return false;
         };
 
-    Sort(sorting, atoz);
+    Sort(sorting, ascending);
 }
 
-void InventoryLib::Inventory::SortByTag(bool atoz) //first tries to sort by tag name, than by name and than by stack size
+void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by tag name, than by name and than by stack size
 {
     //bubble sort
-    auto sorting = [](Inventory* inv, int slotPos, bool atoz) -> bool
+    auto sorting = [](Inventory* inv, int slotPos, bool ascending) -> bool
     {
             if (inv->items->at(slotPos) == nullptr)
             {
@@ -489,7 +489,7 @@ void InventoryLib::Inventory::SortByTag(bool atoz) //first tries to sort by tag 
                 }
             }
 
-            if (atoz)
+            if (ascending)
             {
 
                 if (inv->IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
@@ -507,12 +507,12 @@ void InventoryLib::Inventory::SortByTag(bool atoz) //first tries to sort by tag 
             return false;
     };
 
-    Sort(sorting, atoz);
+    Sort(sorting, ascending);
 }
 
-void InventoryLib::Inventory::SortByStack(bool highToLow)
+void InventoryLib::Inventory::SortByStack(bool ascending)
 {
-    auto sorting = [](Inventory* inv, int slotPos, bool highToLow) -> bool
+    auto sorting = [](Inventory* inv, int slotPos, bool ascending) -> bool
         {
             if (inv->items->at(slotPos) == nullptr)
             {
@@ -534,17 +534,17 @@ void InventoryLib::Inventory::SortByStack(bool highToLow)
                 }
             }
 
-            if (highToLow)
+            if (ascending)
             {
 
-                if (inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
+                if (inv->items->at(slotPos)->currentStack > inv->items->at(slotPos + 1)->currentStack)
                 {
                     return true;
                 }
             }
             else
             {
-                if (inv->items->at(slotPos)->currentStack > inv->items->at(slotPos + 1)->currentStack)
+                if (inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
                 {
                     return true;
                 }
@@ -553,7 +553,7 @@ void InventoryLib::Inventory::SortByStack(bool highToLow)
             return false;
         };
 
-    Sort(sorting, highToLow);
+    Sort(sorting, ascending);
 }
 
 
@@ -704,13 +704,13 @@ InventoryLib::BaseItem* InventoryLib::Inventory::GetItemInSlot(int slot) const
 }
 
 
-void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, bool), bool up)
+void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, bool), bool ascending)
 {
     for (int i = 1; i < GetInventorySize(); i++)
     {
         for (int j = 0; j < GetInventorySize() - i; j++)
         {
-            if(comparison(this, j, up))
+            if(comparison(this, j, ascending))
             {
                 Reorder(j, j + 1);
             }
