@@ -32,7 +32,7 @@ InventoryLib::BaseItem* RandomItem()
     int randomStackSize = rand() % 256;
 
     InventoryLib::BaseItem* retVal = new InventoryLib::BaseItem(randomName, randomTag, randomID, randomStackSize, rand() % (randomStackSize / 2) + randomStackSize / 2);
-    return retVal;
+    return nullptr;
 }
 
 int main()
@@ -48,8 +48,8 @@ int main()
         printf("\n");
     }
 
-    printf("--- Creation of inventory with slots and shrinking it ---\n");
-    if(true)
+    printf("--- Creation of inventory with slots and shrinki*ng it ---\n");
+    if(false)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         bool success;
@@ -154,6 +154,19 @@ int main()
         printf("\n\n\n");
         printf("--- SORTED BY STACK ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
+    }
+
+
+    printf("--- Copy Inventory ---");
+    if(true)
+    {
+        InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
+        inv->AddItem(RandomItem());
+
+        InventoryLib::Inventory* inv2 = new InventoryLib::Inventory(*inv);
+
+        printf("%p \n", inv->GetItemInSlot(1));
+        printf("%p \n", inv2->GetItemInSlot(1));
     }
 
     //int* ignored;

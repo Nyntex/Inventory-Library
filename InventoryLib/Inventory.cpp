@@ -3,16 +3,14 @@
 #include <iostream>
 #include <windows.h>
 
-#include "macros.h"
-
 #pragma region De/Constructors
 InventoryLib::Inventory::Inventory()
 {
     #ifdef _DEBUG
     printf("--- !!! --- \n THIS IS THE DEBUG BUILD, EXPECT MANY LOG OUTPUTS\n--- !!! --- \n");
     #endif
-    this->maxWeight = -1;
-    this->items = new std::vector<BaseItem*>();
+    this->maxCarryWeight = -1;
+    this->items = std::make_unique<BaseItemVector>();
 }
 
 InventoryLib::Inventory::Inventory(int newSlotCount)
@@ -21,34 +19,46 @@ InventoryLib::Inventory::Inventory(int newSlotCount)
     printf("Creating inventory with %i slots.\n", newSlotCount);
 #endif
 
-    this->maxWeight = -1.0f;
-    this->items = new std::vector<BaseItem*>(newSlotCount);
+    this->maxCarryWeight = -1.0f;
+    this->items = std::make_unique<BaseItemVector>(newSlotCount);
 }
 
 InventoryLib::Inventory::Inventory(float newWeight)
 {
     #ifdef _DEBUG
-    printf("Creating inventory with %f maxWeight.\n", newWeight);
+    printf("Creating inventory with %f maxCarryWeight.\n", newWeight);
     #endif
 
-    this->maxWeight = newWeight;
-    this->items = new std::vector<BaseItem*>();
+    this->maxCarryWeight = newWeight;
+    this->items = std::make_unique<BaseItemVector>();
 }
 
-InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, bool useMaxSlotCount, bool useWeight)
+InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, int maxSlots, float maxWeight)
 {
     #ifdef _DEBUG
-    printf("Creating inventory with %i slots and %f maxWeight.\n", newSlotCount, newWeight);
+    printf("Creating inventory with %i slots and %f maxCarryWeight.\n", newSlotCount, newWeight);
     #endif
 
-    this->maxWeight = newWeight;
-    this->items = new std::vector<BaseItem*>(newSlotCount);
+    
+    this->maxSlots = maxSlots;
+    this->maxCarryWeight = newWeight;
+    this->items = std::make_unique<BaseItemVector>(newSlotCount);
+}
+
+InventoryLib::Inventory::Inventory(const Inventory& other)
+{
+    maxCarryWeight = other.maxCarryWeight;
+    maxSlots = other.maxSlots;
+    items = std::make_unique<BaseItemVector>(other.GetInventorySize());
+
+    for (int i = 0; i < other.GetInventorySize(); i++)
+    {
+        items->at(i) = std::make_shared<BaseItem>(*other.items->at(i));
+    }
 }
 
 InventoryLib::Inventory::~Inventory()
 {
-    delete items;
-    items = nullptr;
     #ifdef _DEBUG
     printf("Successfully deleted inventory\n");
     #endif
@@ -215,7 +225,7 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
         return;
     }
 
-    items->at(availableSlot) = item;
+    items->at(availableSlot) = std::make_shared<BaseItem>(*item);
     success = true;
     #ifdef _DEBUG
     printf("Item was successfully added to a new slot (%i).\n", availableSlot);
@@ -274,7 +284,7 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, int slot, bool& success)
         }
     }
 
-    items->at(slot) = item;
+    items->at(slot) = std::make_shared<BaseItem>(*item);
     success = true;
     #ifdef _DEBUG
     printf("Successfully added it as a new item in slot %i.\n", slot);
@@ -299,7 +309,7 @@ void InventoryLib::Inventory::RemoveItem(BaseItem* item, bool& success)
 {
     success = false;
 
-    for (BaseItem* invItem : *items)
+    for (SharedBaseItem& invItem : *items)
     {
         if (invItem == nullptr) continue;
 
@@ -366,7 +376,6 @@ void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount, bool& succe
         if(items->at(removableSlot)->currentStack < amount)
         {
             amount -= items->at(removableSlot)->currentStack;
-            delete items->at(removableSlot);
             items->at(removableSlot) = nullptr;
 
             #ifdef _DEBUG
@@ -377,24 +386,15 @@ void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount, bool& succe
 }
 
 
-void InventoryLib::Inventory::RemoveItem(int slot)
+void InventoryLib::Inventory::RemoveItemInSlot(int slot)
 {
     bool ignored1;
-    BaseItem* ignored2;
-    RemoveItem(slot, ignored1, ignored2);
-    delete ignored2;
+    RemoveItemInSlot(slot, ignored1);
 }
 
-void InventoryLib::Inventory::RemoveItem(int slot, BaseItem*& removedItem)
-{
-    bool ignored;
-    RemoveItem(slot, ignored, removedItem);
-}
-
-void InventoryLib::Inventory::RemoveItem(int slot, bool& success, BaseItem*& removedItem)
+void InventoryLib::Inventory::RemoveItemInSlot(int slot, bool& success)
 {
     success = false;
-    removedItem = nullptr;
 
     if (slot >= GetInventorySize() || slot < 0)
     {
@@ -420,8 +420,6 @@ void InventoryLib::Inventory::RemoveItem(int slot, bool& success, BaseItem*& rem
         return;
     }
 
-    removedItem = new BaseItem(*items->at(slot));
-    delete items->at(slot);
     items->at(slot) = nullptr;
     #ifdef _DEBUG
     printf("Successfully removed item in slot %i.", slot);
@@ -450,14 +448,14 @@ void InventoryLib::Inventory::SortByName(bool ascending)
 
             if (ascending)
             {
-                if (inv->IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
+                if (IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
                 {
                     return true;
                 }
             }
             else
             {
-                if (!inv->IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
+                if (!IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
                 {
                     return true;
                 }
@@ -492,14 +490,14 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
             if (ascending)
             {
 
-                if (inv->IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
+                if (IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
                 {
                     return true;
                 }
             }
             else
             {
-                if (!inv->IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
+                if (!IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
                 {
                     return true;
                 }
@@ -528,7 +526,7 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
                     return true;
                 }
 
-                if (inv->IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
+                if (IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
                 {
                     return true;
                 }
@@ -557,7 +555,7 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
 }
 
 
-std::string InventoryLib::Inventory::GetInventoryStructure(bool readable)
+std::string InventoryLib::Inventory::GetInventoryStructure(bool readable) const
 {
     std::string retVal = "";
 
@@ -584,8 +582,8 @@ std::string InventoryLib::Inventory::GetInventoryStructure(bool readable)
         }
         else
         {
-            retVal += "{ItemID:" + items->at(i)->ID + ": ";
-            retVal += "{Name:" + items->at(i)->name + "; Tag:" + items->at(i)->tag + 
+            retVal += "{ItemID:" + items->at(i)->ID + ": "+
+                "{Name:" + items->at(i)->name + "; Tag:" + items->at(i)->tag + 
                 "; StackSize:" + std::to_string(items->at(i)->stackSize) + 
                 "; CurrentStack:" + std::to_string(items->at(i)->currentStack) +
                 "; Slot:" + std::to_string(i) + ";}}\n";
@@ -594,11 +592,11 @@ std::string InventoryLib::Inventory::GetInventoryStructure(bool readable)
     return retVal;
 }
 
-int InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks)
+int InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks) const
 {
     for(int i = 0; i < GetInventorySize(); i++)
     {
-        if(items->at(i) == item)
+        if(*items->at(i) == *item)
         {
             if(!allowFullStacks && item != nullptr)
             {
@@ -613,7 +611,7 @@ int InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks)
     return -1;
 }
 
-bool InventoryLib::Inventory::HasItem(BaseItem* item, int*& slots, int amount)
+bool InventoryLib::Inventory::HasItem(BaseItem* item, int*& slots, int amount) const
 {
     if (!item) return false;
 
@@ -636,7 +634,7 @@ bool InventoryLib::Inventory::HasItem(BaseItem* item, int*& slots, int amount)
     return (count >= amount && !slotsWithItem.empty());
 }
 
-bool InventoryLib::Inventory::IsStringGreater(const std::string& first, const std::string& second, int pos)
+bool InventoryLib::IsStringGreater(const std::string& first, const std::string& second, int pos)
 {
     if (pos < 0) pos = 0;
 
@@ -663,7 +661,7 @@ bool InventoryLib::Inventory::IsStringGreater(const std::string& first, const st
     return(optimisedFirst[pos] > optimisedSecond[pos]);
 }
 
-std::string InventoryLib::Inventory::MakeStringUpperCase(const std::string& word)
+std::string InventoryLib::MakeStringUpperCase(const std::string& word)
 {
     std::string retVal = "";
 
@@ -700,7 +698,7 @@ InventoryLib::BaseItem* InventoryLib::Inventory::GetItemInSlot(int slot) const
         #endif
     }
 
-    return items->at(slot);
+    return items->at(slot).get();
 }
 
 
@@ -720,7 +718,7 @@ void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, bool), bo
 
 void InventoryLib::Inventory::Reorder(int pos, int pos2)
 {
-    BaseItem* temp = items->at(pos);
+    SharedBaseItem temp = items->at(pos);
     items->at(pos) = items->at(pos2);
     items->at(pos2) = temp;
 }

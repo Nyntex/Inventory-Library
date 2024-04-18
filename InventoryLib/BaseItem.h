@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 
+#include <string>
 
 namespace InventoryLib
 {
@@ -8,7 +8,7 @@ namespace InventoryLib
     {
     public:
         BaseItem();
-        BaseItem(BaseItem& other);
+        BaseItem(const BaseItem& other);
         BaseItem(std::string newName, std::string newID, int newStackSize, int newCurrentStack);
         BaseItem(std::string newName, std::string newTag, std::string newID, int newStackSize, int newCurrentStack);
         virtual ~BaseItem();
