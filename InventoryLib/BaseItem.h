@@ -55,11 +55,7 @@ namespace InventoryLib
 
         virtual bool IsValid() const
         {
-            bool validity = false;
-            validity = currentStack > 0;
-         
-
-            return validity;
+            return currentStack > 0;
         }
 
         virtual bool IsStackFull()

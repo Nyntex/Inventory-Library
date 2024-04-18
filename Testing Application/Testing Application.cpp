@@ -32,12 +32,11 @@ InventoryLib::BaseItem* RandomItem()
     int randomStackSize = rand() % 256;
 
     InventoryLib::BaseItem* retVal = new InventoryLib::BaseItem(randomName, randomTag, randomID, randomStackSize, rand() % (randomStackSize / 2) + randomStackSize / 2);
-    return nullptr;
+    return retVal;
 }
 
 int main()
 {
-
     printf("--- Creation and deletion of Inventory ---\n");
     if(false)
     {
@@ -48,19 +47,18 @@ int main()
         printf("\n");
     }
 
-    printf("--- Creation of inventory with slots and shrinki*ng it ---\n");
+    printf("--- Creation of inventory with slots and shrinking it ---\n");
     if(false)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
-        bool success;
         #ifdef _DEBUG
         printf("-- Start shrinking --");
         #endif
-        inv->SetSlotCount(16, success);
+        inv->SetSlotCount(16);
         delete inv;
         printf("\n");
 
-        inv = new InventoryLib::Inventory(100.0f);
+        inv = new InventoryLib::Inventory(1, 100.0, -1);
         delete inv;
         printf("\n");
         printf("\n");
@@ -79,14 +77,14 @@ int main()
     }
 
     printf("--- Testing Sort by Name ---\n");
-    if(false)
+    if(true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         inv = new InventoryLib::Inventory(100);
         printf("\n");
 
         //Testing Sort by name
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 5; i++)
         {
             InventoryLib::BaseItem* tempItem = RandomItem();
             inv->AddItem(tempItem);
@@ -94,8 +92,8 @@ int main()
             tempItem->currentStack = 32;
             inv->AddItem(tempItem);
         }
-
         printf("\n");
+
         printf("--- UNSORTED ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
         inv->SortByName();
@@ -104,16 +102,17 @@ int main()
         printf(inv->GetInventoryStructure(false).c_str());
         printf("\n");
         printf("\n");
+        printf("\n");
     }
 
     printf("--- Testing Sort by Tag ---\n");
-    if (false)
+    if (true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         printf("\n");
 
         //Testing Sort by name
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 5; i++)
         {
             InventoryLib::BaseItem* tempItem = RandomItem();
             inv->AddItem(tempItem);
@@ -121,23 +120,27 @@ int main()
             tempItem->currentStack = 50;
             inv->AddItem(tempItem);
         }
+        printf("\n");
 
         printf("--- UNSORTED ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
         inv->SortByTag();
-        printf("\n\n\n");
+        printf("\n");
         printf("--- SORTED BY TAG ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
+        printf("\n");
+        printf("\n");
+        printf("\n");
     }
     
     printf("--- Testing Sort by Stack ---\n");
-    if (false)
+    if (true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         printf("\n");
 
         //Testing Sort by name
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < 5; i++)
         {
             InventoryLib::BaseItem* tempItem = RandomItem();
             tempItem->currentStack = rand()%200;
@@ -147,26 +150,50 @@ int main()
             }
             inv->AddItem(tempItem);
         }
+        printf("\n");
 
         printf("--- UNSORTED ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
         inv->SortByStack(false);
-        printf("\n\n\n");
+        printf("\n");
         printf("--- SORTED BY STACK ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
+        printf("\n");
+        printf("\n");
+        printf("\n");
     }
 
-
-    printf("--- Copy Inventory ---");
+    printf("--- Copy Inventory ---\n");
     if(true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         inv->AddItem(RandomItem());
+        inv->AddItem(RandomItem());
+        inv->AddItem(RandomItem());
+        inv->AddItem(RandomItem());
+
+        inv->SortByName(true);
+        printf("\n");
 
         InventoryLib::Inventory* inv2 = new InventoryLib::Inventory(*inv);
 
-        printf("%p \n", inv->GetItemInSlot(1));
-        printf("%p \n", inv2->GetItemInSlot(1));
+        printf("%p \n", inv->GetItemInSlot(0).get());
+        printf("%p \n", inv->GetItemInSlot(1).get());
+        printf("%p \n", inv->GetItemInSlot(2).get());
+        printf("%p \n", inv->GetItemInSlot(3).get());
+        printf(inv->GetInventoryStructure(false).c_str());
+        printf("\n");
+
+        //this item should be the same item as in the other inventory but with a different pointer
+        printf("%p \n", inv2->GetItemInSlot(0).get());
+        printf("%p \n", inv2->GetItemInSlot(1).get());
+        printf("%p \n", inv2->GetItemInSlot(2).get());
+        printf("%p \n", inv2->GetItemInSlot(3).get());
+        printf(inv2->GetInventoryStructure(false).c_str());
+
+        printf("\n");
+        printf("\n");
+        printf("\n");
     }
 
     //int* ignored;

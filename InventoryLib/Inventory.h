@@ -8,9 +8,11 @@
 
 namespace InventoryLib
 {
-    typedef std::shared_ptr<BaseItem> SharedBaseItem;
-    typedef std::vector<SharedBaseItem> BaseItemVector;
-    typedef std::unique_ptr<BaseItemVector> UniqueBaseItemVector;
+#pragma region typedefs
+    typedef std::shared_ptr<BaseItem> SharedPtrBaseItem;
+    typedef std::vector<SharedPtrBaseItem> BaseItemVector;
+    typedef std::unique_ptr<BaseItemVector> UniquePtrBaseItemVector;
+#pragma endregion
 
     std::string MakeStringUpperCase(const std::string& word);
     bool IsStringGreater(const std::string& first, const std::string& second, int pos = 0);
@@ -18,10 +20,8 @@ namespace InventoryLib
     class Inventory
     {
     public:
-        Inventory();
-        Inventory(int newSlotCount);
-        Inventory(float newWeight);
-        Inventory(int newSlotCount, float newWeight, int maxSlots = -1, float maxWeight = -1.0f);
+#pragma region Constructor and operator
+        Inventory(int newSlotCount = 1, float newWeight = -1, int maxSlots = -1, bool newAutoResize = false, float maxWeight = -1.0f);
         Inventory(const Inventory& other); // copy constructor will copy the values of the items and not their shared pointer
         virtual ~Inventory();
 
@@ -60,56 +60,52 @@ namespace InventoryLib
         {
             return !(*this == other);
         }
+#pragma endregion
 
 #pragma region Member
     private:
-        //TODO: MAKE INVENTORY USE WEIGHT
-        float maxCarryWeight = -1.0f;// 0> deactivates maxCarryWeight
-        
         int maxSlots = -1;// -1 deactivates max slots and the inventory can grow almost indefinitely
+        bool autoResize = false; //whether to add new slots when the last slot is getting filled
 
-        UniqueBaseItemVector items;
+        //TODO: MAKE INVENTORY USE WEIGHT
+        float maxCarryWeight = -1.0f;// <0 deactivates maxCarryWeight
+        float weight = -1.0f;       //the weight of the inventory
+
+
+        UniquePtrBaseItemVector items;
 
 #pragma endregion
 
 
 #pragma region Functions
     public:
-        virtual void SetSlotCount(int newSlotCount, bool& success);
-        virtual void SetSlotCount(int newSlotCount);
+        virtual bool SetSlotCount(int newSlotCount); //returns whether it successfully changed it's size
 
-        virtual void AddItem(BaseItem* item);
-        virtual void AddItem(BaseItem* item, int slot);
-        virtual void AddItem(BaseItem* item, bool& success);
-        virtual void AddItem(BaseItem* item, int slot, bool& success);
+        virtual bool AddItem(BaseItem* item);
+        virtual bool AddItem(BaseItem* item, int slot);
 
-        virtual void RemoveItem(BaseItem* item);
-        virtual void RemoveItem(BaseItem* item, int amount);
-        virtual void RemoveItem(BaseItem* item, bool& success);
-        virtual void RemoveItem(BaseItem* item, int amount, bool& success);
+        virtual bool RemoveItem(BaseItem* item);
+        virtual bool RemoveItem(BaseItem* item, int amount);
 
-        virtual void RemoveItemInSlot(int slot);
-        virtual void RemoveItemInSlot(int slot, bool& success);
+        virtual bool RemoveItemInSlot(int slot);
 
         virtual void SortByName(bool ascending = true);
         virtual void SortByTag(bool ascending = true);
         virtual void SortByStack(bool ascending = true);
 
+
+        virtual SharedPtrBaseItem GetItemInSlot(int slot) const;
         virtual std::string GetInventoryStructure(bool readable = true) const;
-
-        virtual int FindItem(BaseItem* item, bool allowFullStacks = true) const;
-        virtual bool HasItem(BaseItem* item, int*& slots, int amount = 1) const;
-
-        virtual BaseItem* GetItemInSlot(int slot) const;
-
+        virtual std::vector<int> FindItem(BaseItem* item, bool allowFullStacks = true) const;
+        virtual bool HasItem(BaseItem* item, std::vector<int>& slots, int amount = 1) const;
+        virtual bool HasEnoughSpaceToAddItem(BaseItem* item);
         virtual int GetInventorySize() const
         {
             return static_cast<int>(items->size());
         }
-
         virtual bool IsInventoryFull() const
         {
-            for (const SharedBaseItem& item : *items)
+            for (const SharedPtrBaseItem& item : *items)
             {
                 if (item == nullptr) return false;
             }

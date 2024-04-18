@@ -4,36 +4,8 @@
 #include <windows.h>
 
 #pragma region De/Constructors
-InventoryLib::Inventory::Inventory()
-{
-    #ifdef _DEBUG
-    printf("--- !!! --- \n THIS IS THE DEBUG BUILD, EXPECT MANY LOG OUTPUTS\n--- !!! --- \n");
-    #endif
-    this->maxCarryWeight = -1;
-    this->items = std::make_unique<BaseItemVector>();
-}
 
-InventoryLib::Inventory::Inventory(int newSlotCount)
-{
-#ifdef _DEBUG
-    printf("Creating inventory with %i slots.\n", newSlotCount);
-#endif
-
-    this->maxCarryWeight = -1.0f;
-    this->items = std::make_unique<BaseItemVector>(newSlotCount);
-}
-
-InventoryLib::Inventory::Inventory(float newWeight)
-{
-    #ifdef _DEBUG
-    printf("Creating inventory with %f maxCarryWeight.\n", newWeight);
-    #endif
-
-    this->maxCarryWeight = newWeight;
-    this->items = std::make_unique<BaseItemVector>();
-}
-
-InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, int maxSlots, float maxWeight)
+InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, int maxSlots, bool newAutoResize, float maxWeight)
 {
     #ifdef _DEBUG
     printf("Creating inventory with %i slots and %f maxCarryWeight.\n", newSlotCount, newWeight);
@@ -41,18 +13,22 @@ InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, int maxSlo
 
     
     this->maxSlots = maxSlots;
-    this->maxCarryWeight = newWeight;
+    this->maxCarryWeight = maxWeight;
+    this->weight = newWeight;
     this->items = std::make_unique<BaseItemVector>(newSlotCount);
 }
 
 InventoryLib::Inventory::Inventory(const Inventory& other)
 {
     maxCarryWeight = other.maxCarryWeight;
+    weight = other.weight;
     maxSlots = other.maxSlots;
+    autoResize = other.autoResize;
     items = std::make_unique<BaseItemVector>(other.GetInventorySize());
 
     for (int i = 0; i < other.GetInventorySize(); i++)
     {
+        if (other.items->at(i) == nullptr) continue;
         items->at(i) = std::make_shared<BaseItem>(*other.items->at(i));
     }
 }
@@ -66,11 +42,14 @@ InventoryLib::Inventory::~Inventory()
 
 #pragma endregion
 
-void InventoryLib::Inventory::SetSlotCount(int newSlotCount, bool& success)
+bool InventoryLib::Inventory::SetSlotCount(int newSlotCount)
 {
-    success = false;
+    bool success = false;
 
-    if (newSlotCount < 1) return;
+    if (newSlotCount < 0)
+    {
+        return false;
+    }
 
     if (GetInventorySize() == newSlotCount)
     {
@@ -79,10 +58,8 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount, bool& success)
         #endif
 
         success = true;
-        return;
     }
-
-    if (GetInventorySize() < newSlotCount)
+    else if (GetInventorySize() < newSlotCount)
     {
         const int amountToAdd = newSlotCount - GetInventorySize();
 
@@ -100,12 +77,8 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount, bool& success)
         printf("successfully changed inventory size from %i to %i.\n", originalSize, GetInventorySize());
         #endif
 
-
-        
-
         success = true;
     }
-
     else if (GetInventorySize() > newSlotCount)
     {
         bool canShrink = true;
@@ -119,7 +92,7 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount, bool& success)
         for(int i = newSlotCount-1; i < static_cast<int>(items->size()); i++)
         {
             if (items->at(i) != nullptr) canShrink = false;
-            if (!canShrink) return;
+            if (!canShrink) return success;
         }
 
         #ifdef _DEBUG
@@ -137,74 +110,68 @@ void InventoryLib::Inventory::SetSlotCount(int newSlotCount, bool& success)
 
         success = true;
     }
-}
-
-void InventoryLib::Inventory::SetSlotCount(int newSlotCount)
-{
-    bool ignored;
-    SetSlotCount(newSlotCount, ignored);
+    return success;
 }
 
 
-void InventoryLib::Inventory::AddItem(BaseItem* item)
+bool InventoryLib::Inventory::AddItem(BaseItem* item)
 {
-    bool ignored;
-    AddItem(item, ignored);
-}
-
-void InventoryLib::Inventory::AddItem(BaseItem* item, int slot)
-{
-    bool ignored;
-    AddItem(item, slot, ignored);
-}
-
-void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
-{
-    success = false;
+    bool success = false;
     if (item == nullptr)
     {
         #ifdef _DEBUG
         printf("Invalid item input to add to inventory!\n");
         #endif
-        return;
+        return false;
     }
-    if(!item->IsValid())
+    if (!item->IsValid())
     {
         #ifdef _DEBUG
         printf("Invalid item input to add to inventory!\n");
         #endif
-        return;
+        return false;
+    }
+    if (!HasEnoughSpaceToAddItem(item))
+    {
+        #ifdef _DEBUG
+        printf("Not enough space to add item!\n");
+        #endif
+        return false;
     }
 
     #ifdef _DEBUG
-    printf(("[Adding item with ID: " + item->ID + "]").c_str());
+    printf("[Adding item with ID: %s]", item->ID.c_str());
     #endif
 
-    for(int i = 0; i < GetInventorySize(); i++)
+
+    for (int i = 0; i < GetInventorySize(); i++)
     {
         if (items->at(i) == nullptr) continue;
         if (*items->at(i) == *item)
         {
             if (items->at(i)->currentStack < items->at(i)->stackSize)
             {
-                if(items->at(i)->stackSize - items->at(i)->currentStack >= item->currentStack)
+                if (items->at(i)->stackSize - items->at(i)->currentStack >= item->currentStack)
                 {
                     items->at(i)->currentStack += item->currentStack;
                     success = true;
 
                     #ifdef _DEBUG
                     printf("Added %i to stack in slot %i. Went from %i to %i.", item->currentStack, i, items->at(i)->currentStack - item->currentStack, items->at(i)->currentStack);
-                    if(items->at(i)->currentStack == items->at(i)->stackSize)
+                    if (items->at(i)->currentStack == items->at(i)->stackSize)
                     {
                         printf("Slot %i is maxed out now.", i);
                     }
                     printf("\n");
-                    #endif
-                    return;
+                    #endif  
+                    return success;
                 }
                 else
                 {
-                    int added = item->currentStack;
+                    #ifdef _DEBUG
+                    const int added = item->currentStack;
+                    #endif
+
                     item->currentStack -= items->at(i)->stackSize - items->at(i)->currentStack;
                     items->at(i)->currentStack = items->at(i)->stackSize;
 
@@ -216,32 +183,27 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, bool& success)
         }
     }
 
-    const int availableSlot = FindItem(nullptr);
-    if(availableSlot == -1)
-    {
-        #ifdef _DEBUG
-        printf("No space to add item.\n");
-        #endif
-        return;
-    }
+    const std::vector<int> availableSlot = FindItem(nullptr);
+    items->at(availableSlot.at(0)) = std::make_shared<BaseItem>(*item);
 
-    items->at(availableSlot) = std::make_shared<BaseItem>(*item);
-    success = true;
     #ifdef _DEBUG
-    printf("Item was successfully added to a new slot (%i).\n", availableSlot);
+    printf("Item was successfully added to a new slot (%i).\n", availableSlot.at(0));
     #endif
+
+    success = true;
+    return success;
 }
 
-void InventoryLib::Inventory::AddItem(BaseItem* item, int slot, bool& success)
+bool InventoryLib::Inventory::AddItem(BaseItem* item, int slot)
 {
-    success = false;
+    bool success = false;
 
     if (slot >= GetInventorySize() || slot < 0)
     {
         #ifdef _DEBUG
         printf("Slot outside inventory range! Slot: %i | InventorySize: %i \n", slot, GetInventorySize());
         #endif
-        return;
+        return success;
     }
 
     if (item == nullptr)
@@ -249,108 +211,97 @@ void InventoryLib::Inventory::AddItem(BaseItem* item, int slot, bool& success)
         #ifdef _DEBUG
         printf("tried to add nullptr to inventory");
         #endif
-        return;
+        return success;
     }
+
     if (items->at(slot) != nullptr)
     {
-        if(*items->at(slot) != *item)
+        if (*items->at(slot) != *item)
         {
             #ifdef _DEBUG
             printf("Theres already a different item in slot %i. ID: %s \n", slot, items->at(slot)->ID.c_str());
             #endif
-            return;
+
+            return success;
         }
 
         const int possibleToAdd = items->at(slot)->stackSize - items->at(slot)->currentStack;
-        if(possibleToAdd >= item->currentStack)
+        if (possibleToAdd >= item->currentStack)
         {
             items->at(slot)->currentStack += item->currentStack;
-            success = true;
 
             #ifdef _DEBUG
             printf("Successfully increased stack of item in slot %i.\n", slot);
             #endif
-            return;
+
+            success = true;
+            return success;
         }
         else
         {
             items->at(slot)->currentStack += possibleToAdd;
             item->currentStack -= possibleToAdd;
-            success = true;
+
             #ifdef _DEBUG
             printf("Successfully filled stack of item in slot %i. The input item stack got reduced to %i.\n", slot, item->currentStack);
             #endif
-            return;
+
+            success = true;
+            return success;
         }
     }
 
     items->at(slot) = std::make_shared<BaseItem>(*item);
-    success = true;
+
     #ifdef _DEBUG
     printf("Successfully added it as a new item in slot %i.\n", slot);
     #endif
+
+    success = true;
+    return success;
 }
 
 
-
-void InventoryLib::Inventory::RemoveItem(BaseItem* item)
+bool InventoryLib::Inventory::RemoveItem(BaseItem* item)
 {
-    bool ignored;
-    RemoveItem(item, ignored);
-}
-
-void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
-{
-    bool ignored;
-    RemoveItem(item, amount, ignored);
-}
-
-void InventoryLib::Inventory::RemoveItem(BaseItem* item, bool& success)
-{
-    success = false;
-
-    for (SharedBaseItem& invItem : *items)
+    for (SharedPtrBaseItem& invItem : *items)
     {
         if (invItem == nullptr) continue;
 
-        if(*invItem == *item)
+        if (*invItem == *item)
         {
-            invItem = nullptr;
-            success = true;
-
             #ifdef _DEBUG
             printf("Successfully removed itemstack with ID %s.\n", item->ID.c_str());
             #endif
 
-            return;
+            invItem = nullptr;
+            return true;
         }
     }
-    
+    return false;
 }
 
-void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount, bool& success)
+bool InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
 {
-    success = false;
-
-    if(item == nullptr)
+    if (item == nullptr)
     {
         #ifdef _DEBUG
         printf("Invalid item input to remove from inventory!\n");
         #endif
-        return;
+        return false;
     }
 
-    std::vector<int>* itemsToRemove = new std::vector<int>();
+    std::vector<int> itemsToRemove{};
     int totalCount = 0;
 
-    for(int i = 0; i < GetInventorySize(); i++)
+    for (int i = 0; i < GetInventorySize(); i++)
     {
         if (items->at(i) == nullptr) continue;
-        
+
         if (*items->at(i) == *item)
         {
             totalCount += items->at(i)->currentStack;
-            itemsToRemove->push_back(i);
+            itemsToRemove.push_back(i);
         }
     }
 
@@ -359,21 +310,21 @@ void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount, bool& succe
         #ifdef _DEBUG
         printf("Not enough items of this kind: %s", item->ID.c_str());
         #endif
+        return false;
     }
 
-    for (const int removableSlot : *itemsToRemove)
+    for (const int removableSlot : itemsToRemove)
     {
-        if(items->at(removableSlot)->currentStack >= amount)
+        if (items->at(removableSlot)->currentStack >= amount)
         {
             #ifdef _DEBUG
             printf("Removed %i items from stack in slot %i. Went from %i to %i.\n", amount, removableSlot, items->at(removableSlot)->currentStack, items->at(removableSlot)->currentStack - amount);
             #endif
             items->at(removableSlot)->currentStack -= amount;
-            success = true;
-            return;
+            return true;
         }
 
-        if(items->at(removableSlot)->currentStack < amount)
+        if (items->at(removableSlot)->currentStack < amount)
         {
             amount -= items->at(removableSlot)->currentStack;
             items->at(removableSlot) = nullptr;
@@ -383,25 +334,20 @@ void InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount, bool& succe
             #endif
         }
     }
+
+    return false;
 }
 
 
-void InventoryLib::Inventory::RemoveItemInSlot(int slot)
+bool InventoryLib::Inventory::RemoveItemInSlot(int slot)
 {
-    bool ignored1;
-    RemoveItemInSlot(slot, ignored1);
-}
-
-void InventoryLib::Inventory::RemoveItemInSlot(int slot, bool& success)
-{
-    success = false;
-
     if (slot >= GetInventorySize() || slot < 0)
     {
         #ifdef _DEBUG
         printf("Slot out of range. Slot: %i | Inventory size: %i", slot, GetInventorySize());
         #endif
-        return;
+
+        return false;
     }
 
     if (items->at(slot) == nullptr)
@@ -409,7 +355,8 @@ void InventoryLib::Inventory::RemoveItemInSlot(int slot, bool& success)
         #ifdef _DEBUG
         printf("Item in slot %i is already empty", slot);
         #endif
-        return;
+
+        return false;
     }
 
     if (!items->at(slot)->IsValid())
@@ -417,15 +364,16 @@ void InventoryLib::Inventory::RemoveItemInSlot(int slot, bool& success)
         #ifdef _DEBUG
         printf("Item in slot %i is invalid", slot);
         #endif
-        return;
+
+        return false;
     }
 
-    items->at(slot) = nullptr;
     #ifdef _DEBUG
     printf("Successfully removed item in slot %i.", slot);
     #endif
+    items->at(slot) = nullptr;
+    return true;
 }
-
 
 
 void InventoryLib::Inventory::SortByName(bool ascending)
@@ -592,11 +540,20 @@ std::string InventoryLib::Inventory::GetInventoryStructure(bool readable) const
     return retVal;
 }
 
-int InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks) const
+std::vector<int> InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks) const
 {
+    std::vector<int> retVal{};
+
     for(int i = 0; i < GetInventorySize(); i++)
     {
-        if(*items->at(i) == *item)
+        if(item == nullptr)
+        {
+            if(items->at(i) == nullptr)
+            {
+                retVal.push_back(i);
+            }
+        }
+        else if(*items->at(i) == *item)
         {
             if(!allowFullStacks && item != nullptr)
             {
@@ -605,13 +562,13 @@ int InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks) cons
                     continue;
                 }
             }
-            return i;
+            retVal.push_back(i);
         }
     }
-    return -1;
+    return retVal;
 }
 
-bool InventoryLib::Inventory::HasItem(BaseItem* item, int*& slots, int amount) const
+bool InventoryLib::Inventory::HasItem(BaseItem* item, std::vector<int>& slots, int amount) const
 {
     if (!item) return false;
 
@@ -629,9 +586,30 @@ bool InventoryLib::Inventory::HasItem(BaseItem* item, int*& slots, int amount) c
         }
     }
 
-    slots = slotsWithItem.data();
+    slots = slotsWithItem;
 
     return (count >= amount && !slotsWithItem.empty());
+}
+
+bool InventoryLib::Inventory::HasEnoughSpaceToAddItem(BaseItem* item)
+{
+    std::vector<int> slotsWithItem{};
+    std::vector<int> ignored{};
+
+    if(HasItem(nullptr, ignored))
+    {
+        return true;
+    }
+    HasItem(item, slotsWithItem);
+
+    int spaceAvailable = 0;
+
+    for (int slot : slotsWithItem)
+    {
+        spaceAvailable += item->stackSize - items->at(slot)->currentStack;
+    }
+
+    return spaceAvailable > item->currentStack;
 }
 
 bool InventoryLib::IsStringGreater(const std::string& first, const std::string& second, int pos)
@@ -681,7 +659,7 @@ std::string InventoryLib::MakeStringUpperCase(const std::string& word)
 }
 
 
-InventoryLib::BaseItem* InventoryLib::Inventory::GetItemInSlot(int slot) const
+InventoryLib::SharedPtrBaseItem InventoryLib::Inventory::GetItemInSlot(int slot) const
 {
     if (slot >= GetInventorySize() || slot < 0)
     {
@@ -698,7 +676,7 @@ InventoryLib::BaseItem* InventoryLib::Inventory::GetItemInSlot(int slot) const
         #endif
     }
 
-    return items->at(slot).get();
+    return items->at(slot);
 }
 
 
@@ -718,7 +696,7 @@ void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, bool), bo
 
 void InventoryLib::Inventory::Reorder(int pos, int pos2)
 {
-    SharedBaseItem temp = items->at(pos);
+    SharedPtrBaseItem temp = items->at(pos);
     items->at(pos) = items->at(pos2);
     items->at(pos2) = temp;
 }
