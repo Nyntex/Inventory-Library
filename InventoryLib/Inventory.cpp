@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Inventory.h"
 #include <iostream>
-#include <windows.h>
 
 #pragma region De/Constructors
 
@@ -131,18 +130,39 @@ bool InventoryLib::Inventory::AddItem(BaseItem* item)
         #endif
         return false;
     }
-    if (!HasEnoughSpaceToAddItem(item))
+    bool enoughSpace = HasEnoughSpaceToAddItem(item);
+    if (!enoughSpace)
     {
-        #ifdef _DEBUG
-        printf("Not enough space to add item!\n");
-        #endif
-        return false;
+        if(autoResize)
+        {
+            for(int i = 0; i < 4; i++)
+            {
+                items->push_back(nullptr);
+            }
+            enoughSpace = true;
+        }
+        else
+        {
+            #ifdef _DEBUG
+            printf("Not enough space to add item!\n");
+            #endif
+            return false;
+        }
+    }
+    if(maxCarryWeight >= 0.0f)
+    {
+        if(GetCurrentCarryingWeight() + item->WeightOfStack() > maxCarryWeight)
+        {
+            #ifdef _DEBUG
+            printf("Not enough carrying capacity to add item!\n");
+            #endif
+            return false;
+        }
     }
 
     #ifdef _DEBUG
     printf("[Adding item with ID: %s]", item->ID.c_str());
     #endif
-
 
     for (int i = 0; i < GetInventorySize(); i++)
     {
@@ -194,7 +214,7 @@ bool InventoryLib::Inventory::AddItem(BaseItem* item)
     return success;
 }
 
-bool InventoryLib::Inventory::AddItem(BaseItem* item, int slot)
+bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
 {
     bool success = false;
 
@@ -261,33 +281,34 @@ bool InventoryLib::Inventory::AddItem(BaseItem* item, int slot)
     return success;
 }
 
-
-bool InventoryLib::Inventory::RemoveItem(BaseItem* item)
-{
-    for (SharedPtrBaseItem& invItem : *items)
-    {
-        if (invItem == nullptr) continue;
-
-        if (*invItem == *item)
-        {
-            #ifdef _DEBUG
-            printf("Successfully removed itemstack with ID %s.\n", item->ID.c_str());
-            #endif
-
-            invItem = nullptr;
-            return true;
-        }
-    }
-    return false;
-}
-
 bool InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
 {
+    if (amount == 0) return true;
+
     if (item == nullptr)
     {
         #ifdef _DEBUG
         printf("Invalid item input to remove from inventory!\n");
         #endif
+        return false;
+    }
+
+    if(amount < 0)
+    {
+        for (SharedPtrBaseItem& invItem : *items)
+        {
+            if (invItem == nullptr) continue;
+
+            if (*invItem == *item)
+            {
+                #ifdef _DEBUG
+                printf("Successfully removed itemstack with ID %s.\n", item->ID.c_str());
+                #endif
+
+                invItem = nullptr;
+                return true;
+            }
+        }
         return false;
     }
 
@@ -338,34 +359,22 @@ bool InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
     return false;
 }
 
-
-bool InventoryLib::Inventory::RemoveItemInSlot(int slot)
+bool InventoryLib::Inventory::RemoveItemInSlot(int slot, int amount)
 {
-    if (slot >= GetInventorySize() || slot < 0)
+    if (IsSlotValid(slot))
     {
-        #ifdef _DEBUG
-        printf("Slot out of range. Slot: %i | Inventory size: %i", slot, GetInventorySize());
-        #endif
-
         return false;
     }
 
-    if (items->at(slot) == nullptr)
+    if (amount == 0) return true;
+
+    if(amount < 0)
     {
         #ifdef _DEBUG
-        printf("Item in slot %i is already empty", slot);
+        printf("Successfully removed item in slot %i.", slot);
         #endif
-
-        return false;
-    }
-
-    if (!items->at(slot)->IsValid())
-    {
-        #ifdef _DEBUG
-        printf("Item in slot %i is invalid", slot);
-        #endif
-
-        return false;
+        items->at(slot) = nullptr;
+        return true;
     }
 
     #ifdef _DEBUG
@@ -591,7 +600,7 @@ bool InventoryLib::Inventory::HasItem(BaseItem* item, std::vector<int>& slots, i
     return (count >= amount && !slotsWithItem.empty());
 }
 
-bool InventoryLib::Inventory::HasEnoughSpaceToAddItem(BaseItem* item)
+bool InventoryLib::Inventory::HasEnoughSpaceToAddItem(BaseItem* item) const
 {
     std::vector<int> slotsWithItem{};
     std::vector<int> ignored{};
@@ -658,7 +667,6 @@ std::string InventoryLib::MakeStringUpperCase(const std::string& word)
     return retVal;
 }
 
-
 InventoryLib::SharedPtrBaseItem InventoryLib::Inventory::GetItemInSlot(int slot) const
 {
     if (slot >= GetInventorySize() || slot < 0)
@@ -674,11 +682,57 @@ InventoryLib::SharedPtrBaseItem InventoryLib::Inventory::GetItemInSlot(int slot)
         #ifdef _DEBUG
         printf("Item in slot %i does not exist.", slot);
         #endif
+        return nullptr;
     }
 
     return items->at(slot);
 }
 
+float InventoryLib::Inventory::GetCurrentCarryingWeight() const
+{
+    float retVal = 0.0f;
+    for (SharedPtrBaseItem item : *items)
+    {
+        if(item != nullptr)
+        {
+            retVal += item->WeightOfStack();
+        }
+    }
+    return retVal;
+}
+
+
+bool InventoryLib::Inventory::IsSlotValid(int slot, bool ignoreNullPtr) const
+{
+    if (slot >= GetInventorySize() || slot < 0)
+    {
+        #ifdef _DEBUG
+        printf("Slot out of range. Slot: %i | Inventory size: %i", slot, GetInventorySize());
+        #endif
+
+        return false;
+    }
+
+    if (items->at(slot) == nullptr && !ignoreNullPtr)
+    {
+        #ifdef _DEBUG
+        printf("Item in slot %i is already empty", slot);
+        #endif
+
+        return false;
+    }
+
+    if (!items->at(slot)->IsValid())
+    {
+        #ifdef _DEBUG
+        printf("Item in slot %i is invalid", slot);
+        #endif
+
+        return false;
+    }
+
+    return true;
+}
 
 void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, bool), bool ascending)
 {

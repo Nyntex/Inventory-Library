@@ -23,44 +23,45 @@ namespace InventoryLib
 
         int currentStack = 1;
 
+        float weightPerItem = -1.0f;
+
         virtual bool operator== (const BaseItem& rhs)
         {
             return ID == rhs.ID && name == rhs.name && tag == rhs.tag;
         }
-
         virtual bool operator!= (const BaseItem& rhs)
         {
             return !(ID == rhs.ID);
         }
-
         virtual bool operator< (const BaseItem& rhs)
         {
             return currentStack < rhs.currentStack;
         }
-
         virtual bool operator> (const BaseItem& rhs)
         {
             return currentStack > rhs.currentStack;
         }
-
         virtual bool operator<= (const BaseItem& rhs)
         {
             return !(currentStack > rhs.currentStack);
         }
-
         virtual bool operator>= (const BaseItem& rhs)
         {
             return !(currentStack < rhs.currentStack);
         }
 
+
         virtual bool IsValid() const
         {
             return currentStack > 0;
         }
-
         virtual bool IsStackFull()
         {
             return stackSize == currentStack;
+        }
+        virtual float WeightOfStack()
+        {
+            return weightPerItem * static_cast<float>(currentStack);
         }
     };
 }

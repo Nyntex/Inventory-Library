@@ -71,7 +71,6 @@ namespace InventoryLib
         float maxCarryWeight = -1.0f;// <0 deactivates maxCarryWeight
         float weight = -1.0f;       //the weight of the inventory
 
-
         UniquePtrBaseItemVector items;
 
 #pragma endregion
@@ -82,23 +81,21 @@ namespace InventoryLib
         virtual bool SetSlotCount(int newSlotCount); //returns whether it successfully changed it's size
 
         virtual bool AddItem(BaseItem* item);
-        virtual bool AddItem(BaseItem* item, int slot);
+        virtual bool AddItemToSlot(BaseItem* item, int slot);
 
-        virtual bool RemoveItem(BaseItem* item);
-        virtual bool RemoveItem(BaseItem* item, int amount);
-
-        virtual bool RemoveItemInSlot(int slot);
+        virtual bool RemoveItem(BaseItem* item, int amount = -1);
+        virtual bool RemoveItemInSlot(int slot, int amount = -1);
 
         virtual void SortByName(bool ascending = true);
         virtual void SortByTag(bool ascending = true);
         virtual void SortByStack(bool ascending = true);
 
-
         virtual SharedPtrBaseItem GetItemInSlot(int slot) const;
+        virtual float GetCurrentCarryingWeight() const;
         virtual std::string GetInventoryStructure(bool readable = true) const;
         virtual std::vector<int> FindItem(BaseItem* item, bool allowFullStacks = true) const;
         virtual bool HasItem(BaseItem* item, std::vector<int>& slots, int amount = 1) const;
-        virtual bool HasEnoughSpaceToAddItem(BaseItem* item);
+        virtual bool HasEnoughSpaceToAddItem(BaseItem* item) const;
         virtual int GetInventorySize() const
         {
             return static_cast<int>(items->size());
@@ -112,6 +109,7 @@ namespace InventoryLib
 
             return true;
         }
+        virtual bool IsSlotValid(int slot, bool ignoreNullPtr = false) const;
 
         //Takes a lambda function which is optimised for a bubble sort
         virtual void Sort(bool (*comparison)(Inventory*,int,bool), bool ascending);
