@@ -223,7 +223,7 @@ bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
         #ifdef _DEBUG
         printf("Slot outside inventory range! Slot: %i | InventorySize: %i \n", slot, GetInventorySize());
         #endif
-        return success;
+        return false;
     }
 
     if (item == nullptr)
@@ -231,7 +231,7 @@ bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
         #ifdef _DEBUG
         printf("tried to add nullptr to inventory");
         #endif
-        return success;
+        return false;
     }
 
     if (items->at(slot) != nullptr)
@@ -242,7 +242,7 @@ bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
             printf("Theres already a different item in slot %i. ID: %s \n", slot, items->at(slot)->ID.c_str());
             #endif
 
-            return success;
+            return false;
         }
 
         const int possibleToAdd = items->at(slot)->stackSize - items->at(slot)->currentStack;
@@ -361,43 +361,79 @@ bool InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
 
 bool InventoryLib::Inventory::RemoveItemInSlot(int slot, int amount)
 {
-    if (IsSlotValid(slot))
+    if (!IsItemInSlotValid(slot))
     {
         return false;
     }
 
-    if (amount == 0) return true;
+    if (amount == 0)
+    {
+        #ifdef _DEBUG
+        printf("Amount to remove was 0, successfully removed nothing.\n");
+        #endif
+        return true;
+    }
 
     if(amount < 0)
     {
         #ifdef _DEBUG
-        printf("Successfully removed item in slot %i.", slot);
+        printf("Successfully removed item stack in slot %i.\n", slot);
         #endif
         items->at(slot) = nullptr;
         return true;
     }
 
+    if(amount > items->at(slot)->currentStack)
+    {
+        #ifdef _DEBUG
+        printf("Item stack in slot %i does not contain %i items\n", slot, amount);
+        #endif
+        return false;
+    }
+
+    if(amount < items->at(slot)->currentStack)
+    {
+        #ifdef _DEBUG
+        printf("Successfully removed all items in slot %i.\n", slot);
+        #endif
+        items->at(slot)->currentStack -= amount;
+        return true;
+    }
+
     #ifdef _DEBUG
-    printf("Successfully removed item in slot %i.", slot);
+    printf("Successfully removed all items in slot %i.\n", slot);
     #endif
     items->at(slot) = nullptr;
     return true;
 }
 
+void InventoryLib::Inventory::Sort(bool(* comparison)(const UniquePtrBaseItemVector&, int, bool), bool ascending)
+{
+    for (int i = 1; i < GetInventorySize(); i++)
+    {
+        for (int j = 0; j < GetInventorySize() - i; j++)
+        {
+            if(comparison(items, j, ascending))
+            {
+                Reorder(j, j + 1);
+            }
+        }
+    }
+}
 
 void InventoryLib::Inventory::SortByName(bool ascending)
 {
-    auto sorting = [](Inventory* inv, int slotPos, bool ascending) -> bool
+    auto sorting = [](const UniquePtrBaseItemVector& items, int slotPos, bool ascending) -> bool
         {
-            if (inv->items->at(slotPos) == nullptr)
+            if (items->at(slotPos) == nullptr)
             {
                 return true;
             }
-            if (inv->items->at(slotPos + 1) == nullptr) return false;
+            if (items->at(slotPos + 1) == nullptr) return false;
 
-            if (inv->items->at(slotPos)->name == inv->items->at(slotPos + 1)->name)
+            if (items->at(slotPos)->name == items->at(slotPos + 1)->name)
             {
-                if (inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
+                if (items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
                 {
                     return true;
                 }
@@ -405,14 +441,14 @@ void InventoryLib::Inventory::SortByName(bool ascending)
 
             if (ascending)
             {
-                if (IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
+                if (IsStringGreater(items->at(slotPos)->name, items->at(slotPos + 1)->name))
                 {
                     return true;
                 }
             }
             else
             {
-                if (!IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
+                if (!IsStringGreater(items->at(slotPos)->name, items->at(slotPos + 1)->name))
                 {
                     return true;
                 }
@@ -427,18 +463,18 @@ void InventoryLib::Inventory::SortByName(bool ascending)
 void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by tag name, than by name and than by stack size
 {
     //bubble sort
-    auto sorting = [](Inventory* inv, int slotPos, bool ascending) -> bool
+    auto sorting = [](const UniquePtrBaseItemVector& items, int slotPos, bool ascending) -> bool
     {
-            if (inv->items->at(slotPos) == nullptr)
+            if (items->at(slotPos) == nullptr)
             {
                 return true;
             }
-            if (inv->items->at(slotPos + 1) == nullptr) return false;
+            if (items->at(slotPos + 1) == nullptr) return false;
 
-            if (inv->items->at(slotPos)->tag == inv->items->at(slotPos + 1)->tag)
+            if (items->at(slotPos)->tag == items->at(slotPos + 1)->tag)
             {
-                if (inv->items->at(slotPos)->name == inv->items->at(slotPos + 1)->name &&
-                    inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
+                if (items->at(slotPos)->name == items->at(slotPos + 1)->name &&
+                    items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
                 {
                     return true;
                 }
@@ -447,14 +483,14 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
             if (ascending)
             {
 
-                if (IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
+                if (IsStringGreater(items->at(slotPos)->tag, items->at(slotPos + 1)->tag))
                 {
                     return true;
                 }
             }
             else
             {
-                if (!IsStringGreater(inv->items->at(slotPos)->tag, inv->items->at(slotPos + 1)->tag))
+                if (!IsStringGreater(items->at(slotPos)->tag, items->at(slotPos + 1)->tag))
                 {
                     return true;
                 }
@@ -467,23 +503,23 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
 
 void InventoryLib::Inventory::SortByStack(bool ascending)
 {
-    auto sorting = [](Inventory* inv, int slotPos, bool ascending) -> bool
+    auto sorting = [](const UniquePtrBaseItemVector& items, int slotPos, bool ascending) -> bool
         {
-            if (inv->items->at(slotPos) == nullptr)
+            if (items->at(slotPos) == nullptr)
             {
                 return true;
             }
-            if (inv->items->at(slotPos + 1) == nullptr) return false;
+            if (items->at(slotPos + 1) == nullptr) return false;
 
-            if (inv->items->at(slotPos)->currentStack == inv->items->at(slotPos + 1)->currentStack)
+            if (items->at(slotPos)->currentStack == items->at(slotPos + 1)->currentStack)
             {
-                if (inv->items->at(slotPos)->name == inv->items->at(slotPos + 1)->name &&
-                    inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
+                if (items->at(slotPos)->name == items->at(slotPos + 1)->name &&
+                    items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
                 {
                     return true;
                 }
 
-                if (IsStringGreater(inv->items->at(slotPos)->name, inv->items->at(slotPos + 1)->name))
+                if (IsStringGreater(items->at(slotPos)->name, items->at(slotPos + 1)->name))
                 {
                     return true;
                 }
@@ -492,14 +528,14 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
             if (ascending)
             {
 
-                if (inv->items->at(slotPos)->currentStack > inv->items->at(slotPos + 1)->currentStack)
+                if (items->at(slotPos)->currentStack > items->at(slotPos + 1)->currentStack)
                 {
                     return true;
                 }
             }
             else
             {
-                if (inv->items->at(slotPos)->currentStack < inv->items->at(slotPos + 1)->currentStack)
+                if (items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
                 {
                     return true;
                 }
@@ -509,6 +545,13 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
         };
 
     Sort(sorting, ascending);
+}
+
+void InventoryLib::Inventory::Reorder(int pos, int pos2)
+{
+    SharedPtrBaseItem temp = items->at(pos);
+    items->at(pos) = items->at(pos2);
+    items->at(pos2) = temp;
 }
 
 
@@ -691,7 +734,7 @@ InventoryLib::SharedPtrBaseItem InventoryLib::Inventory::GetItemInSlot(int slot)
 float InventoryLib::Inventory::GetCurrentCarryingWeight() const
 {
     float retVal = 0.0f;
-    for (SharedPtrBaseItem item : *items)
+    for (const SharedPtrBaseItem& item : *items)
     {
         if(item != nullptr)
         {
@@ -701,8 +744,7 @@ float InventoryLib::Inventory::GetCurrentCarryingWeight() const
     return retVal;
 }
 
-
-bool InventoryLib::Inventory::IsSlotValid(int slot, bool ignoreNullPtr) const
+bool InventoryLib::Inventory::IsItemInSlotValid(int slot) const
 {
     if (slot >= GetInventorySize() || slot < 0)
     {
@@ -713,7 +755,7 @@ bool InventoryLib::Inventory::IsSlotValid(int slot, bool ignoreNullPtr) const
         return false;
     }
 
-    if (items->at(slot) == nullptr && !ignoreNullPtr)
+    if (items->at(slot) == nullptr)
     {
         #ifdef _DEBUG
         printf("Item in slot %i is already empty", slot);
@@ -734,26 +776,6 @@ bool InventoryLib::Inventory::IsSlotValid(int slot, bool ignoreNullPtr) const
     return true;
 }
 
-void InventoryLib::Inventory::Sort(bool(* comparison)(Inventory*, int, bool), bool ascending)
-{
-    for (int i = 1; i < GetInventorySize(); i++)
-    {
-        for (int j = 0; j < GetInventorySize() - i; j++)
-        {
-            if(comparison(this, j, ascending))
-            {
-                Reorder(j, j + 1);
-            }
-        }
-    }
-}
-
-void InventoryLib::Inventory::Reorder(int pos, int pos2)
-{
-    SharedPtrBaseItem temp = items->at(pos);
-    items->at(pos) = items->at(pos2);
-    items->at(pos2) = temp;
-}
 
 
 

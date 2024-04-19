@@ -1,8 +1,6 @@
 ﻿  Testing Application.cpp
-Testing Application.obj : error LNK2001: unresolved external symbol "public: virtual __cdecl InventoryLib::BaseItem::~BaseItem(void)" (??1BaseItem@InventoryLib@@UEAA@XZ)
-Testing Application.obj : error LNK2001: unresolved external symbol "public: __cdecl InventoryLib::BaseItem::BaseItem(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,int)" (??0BaseItem@InventoryLib@@QEAA@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@00HH@Z)
-Testing Application.obj : error LNK2001: unresolved external symbol "public: __cdecl InventoryLib::Inventory::Inventory(void)" (??0Inventory@InventoryLib@@QEAA@XZ)
-Testing Application.obj : error LNK2001: unresolved external symbol "public: __cdecl InventoryLib::Inventory::Inventory(int)" (??0Inventory@InventoryLib@@QEAA@H@Z)
-Testing Application.obj : error LNK2001: unresolved external symbol "public: __cdecl InventoryLib::Inventory::Inventory(float)" (??0Inventory@InventoryLib@@QEAA@M@Z)
-Testing Application.obj : error LNK2001: unresolved external symbol "public: __cdecl InventoryLib::Inventory::Inventory(int,float,int,float)" (??0Inventory@InventoryLib@@QEAA@HMHM@Z)
-C:\Users\Nyntex\Desktop\Final Exam\Inventory-Library\x64\Release\Testing Application.exe : fatal error LNK1120: 6 unresolved externals
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 373 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Testing Application.vcxproj -> C:\Users\Nyntex\Desktop\Final Exam\Inventory-Library\x64\Release\Testing Application.exe

@@ -196,6 +196,7 @@ int main()
         printf("\n");
     }
 
+
     //int* ignored;
     //printf("Does the inventory contain the item? : %s\n", inv->HasItem(new InventoryLib::BaseItem(*randomItem1), ignored, 64) ? "True" : "False");
 

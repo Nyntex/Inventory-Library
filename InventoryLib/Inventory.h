@@ -69,16 +69,17 @@ namespace InventoryLib
 
         //TODO: MAKE INVENTORY USE WEIGHT
         float maxCarryWeight = -1.0f;// <0 deactivates maxCarryWeight
-        float weight = -1.0f;       //the weight of the inventory
+        float weight = 0.0f;       //the weight of the inventory
 
         UniquePtrBaseItemVector items;
+
 
 #pragma endregion
 
 
 #pragma region Functions
     public:
-        virtual bool SetSlotCount(int newSlotCount); //returns whether it successfully changed it's size
+        virtual bool SetSlotCount(int newSlotCount);
 
         virtual bool AddItem(BaseItem* item);
         virtual bool AddItemToSlot(BaseItem* item, int slot);
@@ -86,9 +87,12 @@ namespace InventoryLib
         virtual bool RemoveItem(BaseItem* item, int amount = -1);
         virtual bool RemoveItemInSlot(int slot, int amount = -1);
 
+        //Takes a lambda function which is optimised for a bubble sort
+        virtual void Sort(bool (*comparison)(const UniquePtrBaseItemVector&,int,bool), bool ascending);
         virtual void SortByName(bool ascending = true);
         virtual void SortByTag(bool ascending = true);
         virtual void SortByStack(bool ascending = true);
+        virtual void Reorder(int pos, int pos2);
 
         virtual SharedPtrBaseItem GetItemInSlot(int slot) const;
         virtual float GetCurrentCarryingWeight() const;
@@ -109,12 +113,8 @@ namespace InventoryLib
 
             return true;
         }
-        virtual bool IsSlotValid(int slot, bool ignoreNullPtr = false) const;
+        virtual bool IsItemInSlotValid(int slot) const;
 
-        //Takes a lambda function which is optimised for a bubble sort
-        virtual void Sort(bool (*comparison)(Inventory*,int,bool), bool ascending);
-
-        void Reorder(int pos, int pos2);
 #pragma endregion
         
     };
