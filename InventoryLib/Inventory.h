@@ -60,6 +60,7 @@ namespace InventoryLib
         {
             return !(*this == other);
         }
+
 #pragma endregion
 
 #pragma region Member
@@ -67,7 +68,6 @@ namespace InventoryLib
         int maxSlots = -1;// -1 deactivates max slots and the inventory can grow almost indefinitely
         bool autoResize = false; //whether to add new slots when the last slot is getting filled
 
-        //TODO: MAKE INVENTORY USE WEIGHT
         float maxCarryWeight = -1.0f;// <0 deactivates maxCarryWeight
         float weight = 0.0f;       //the weight of the inventory
 
@@ -92,13 +92,14 @@ namespace InventoryLib
         virtual void SortByName(bool ascending = true);
         virtual void SortByTag(bool ascending = true);
         virtual void SortByStack(bool ascending = true);
-        virtual void Reorder(int pos, int pos2);
+        virtual void MoveItemToSlot(int pos, int pos2);
 
         virtual SharedPtrBaseItem GetItemInSlot(int slot) const;
         virtual float GetCurrentCarryingWeight() const;
         virtual std::string GetInventoryStructure(bool readable = true) const;
         virtual std::vector<int> FindItem(BaseItem* item, bool allowFullStacks = true) const;
-        virtual bool HasItem(BaseItem* item, std::vector<int>& slots, int amount = 1) const;
+        virtual bool HasItem(BaseItem* item, int amount = 1) const;
+        virtual std::vector<int> GetSlotsWithItem(BaseItem* item) const;
         virtual bool HasEnoughSpaceToAddItem(BaseItem* item) const;
         virtual int GetInventorySize() const
         {
@@ -114,6 +115,7 @@ namespace InventoryLib
             return true;
         }
         virtual bool IsItemInSlotValid(int slot) const;
+        virtual bool IsSlotValid(int slot) const;
 
 #pragma endregion
         

@@ -41,6 +41,7 @@ InventoryLib::Inventory::~Inventory()
 
 #pragma endregion
 
+
 bool InventoryLib::Inventory::SetSlotCount(int newSlotCount)
 {
     bool success = false;
@@ -131,6 +132,9 @@ bool InventoryLib::Inventory::AddItem(BaseItem* item)
         return false;
     }
     bool enoughSpace = HasEnoughSpaceToAddItem(item);
+    #ifdef _DEBUG
+    printf("Not enough space to add item!\n");
+    #endif
     if (!enoughSpace)
     {
         if(autoResize)
@@ -281,6 +285,7 @@ bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
     return success;
 }
 
+
 bool InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
 {
     if (amount == 0) return true;
@@ -407,6 +412,7 @@ bool InventoryLib::Inventory::RemoveItemInSlot(int slot, int amount)
     return true;
 }
 
+
 void InventoryLib::Inventory::Sort(bool(* comparison)(const UniquePtrBaseItemVector&, int, bool), bool ascending)
 {
     for (int i = 1; i < GetInventorySize(); i++)
@@ -415,7 +421,7 @@ void InventoryLib::Inventory::Sort(bool(* comparison)(const UniquePtrBaseItemVec
         {
             if(comparison(items, j, ascending))
             {
-                Reorder(j, j + 1);
+                MoveItemToSlot(j, j + 1);
             }
         }
     }
@@ -547,8 +553,24 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
     Sort(sorting, ascending);
 }
 
-void InventoryLib::Inventory::Reorder(int pos, int pos2)
+void InventoryLib::Inventory::MoveItemToSlot(int pos, int pos2)
 {
+    if (!IsSlotValid(pos))
+    {
+        #ifdef _DEBUG
+        printf("Slot is invalid: %i", pos);
+        #endif
+        return;
+    }
+
+    if (!IsSlotValid(pos2))
+    {
+        #ifdef _DEBUG
+        printf("Slot is invalid: %i", pos2);
+        #endif
+        return;
+    }
+
     SharedPtrBaseItem temp = items->at(pos);
     items->at(pos) = items->at(pos2);
     items->at(pos2) = temp;
@@ -620,40 +642,55 @@ std::vector<int> InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFul
     return retVal;
 }
 
-bool InventoryLib::Inventory::HasItem(BaseItem* item, std::vector<int>& slots, int amount) const
+bool InventoryLib::Inventory::HasItem(BaseItem* item, int amount) const
 {
-    if (!item) return false;
-
-    std::vector<int> slotsWithItem = std::vector<int>();
     int count = 0;
 
     for(int i = 0; i< GetInventorySize(); i++)
     {
+        if(item == nullptr)
+        {
+            if(items->at(i) == nullptr) return true;
+        }
+        else if(*items->at(i) == *item)
+        {
+            count += items->at(i)->currentStack;
+        }
+
+        if (items->at(i) == nullptr) continue;
+    }
+
+    return count >= amount;
+}
+
+std::vector<int> InventoryLib::Inventory::GetSlotsWithItem(BaseItem* item) const
+{
+    if (!item) return {};
+
+    std::vector<int> retVal{};
+
+    for (int i = 0; i < GetInventorySize(); i++)
+    {
         if (items->at(i) == nullptr) continue;
 
-        if(*items->at(i) == *item)
+        if (*items->at(i) == *item)
         {
-            slotsWithItem.push_back(i);
-            count += items->at(i)->currentStack;
+            retVal.push_back(i);
         }
     }
 
-    slots = slotsWithItem;
-
-    return (count >= amount && !slotsWithItem.empty());
+    return retVal;
 }
 
 bool InventoryLib::Inventory::HasEnoughSpaceToAddItem(BaseItem* item) const
 {
-    std::vector<int> slotsWithItem{};
-    std::vector<int> ignored{};
-
-    if(HasItem(nullptr, ignored))
+    if(HasItem(nullptr))
     {
         return true;
     }
-    HasItem(item, slotsWithItem);
+    HasItem(item);
 
+    std::vector<int> slotsWithItem = GetSlotsWithItem(item);
     int spaceAvailable = 0;
 
     for (int slot : slotsWithItem)
@@ -768,6 +805,20 @@ bool InventoryLib::Inventory::IsItemInSlotValid(int slot) const
     {
         #ifdef _DEBUG
         printf("Item in slot %i is invalid", slot);
+        #endif
+
+        return false;
+    }
+
+    return true;
+}
+
+bool InventoryLib::Inventory::IsSlotValid(int slot) const
+{
+    if (slot >= GetInventorySize() || slot < 0)
+    {
+        #ifdef _DEBUG
+        printf("Slot out of range. Slot: %i | Inventory size: %i", slot, GetInventorySize());
         #endif
 
         return false;

@@ -1,22 +1,21 @@
 #include <iostream>
 #include "Inventory.h"
 
-
 InventoryLib::BaseItem* RandomItem()
 {
-    std::string randomTag = "";
+    std::string randomTag{};
     for (int i = 0; i < 8; i++)
     {
         randomTag += char((rand() % 26) + 65);
     }
 
-    std::string randomName = "";
+    std::string randomName{};
     for (int i = 0; i < 4; i++)
     {
         randomName += char((rand() % 26) + 65);
     }
 
-    std::string randomID = "";
+    std::string randomID{};
     for (int i = 1; i < 21; i++)
     {
         if (i % 7 == 0)
@@ -48,7 +47,7 @@ int main()
     }
 
     printf("--- Creation of inventory with slots and shrinking it ---\n");
-    if(false)
+    if(true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         #ifdef _DEBUG
