@@ -110,6 +110,7 @@ bool InventoryLib::Inventory::SetSlotCount(int newSlotCount)
 
         success = true;
     }
+    ClearPresortedVectors();
     return success;
 }
 
@@ -131,10 +132,8 @@ bool InventoryLib::Inventory::AddItem(BaseItem* item)
         #endif
         return false;
     }
+
     bool enoughSpace = HasEnoughSpaceToAddItem(item);
-    #ifdef _DEBUG
-    printf("Not enough space to add item!\n");
-    #endif
     if (!enoughSpace)
     {
         if(autoResize)
@@ -167,6 +166,8 @@ bool InventoryLib::Inventory::AddItem(BaseItem* item)
     #ifdef _DEBUG
     printf("[Adding item with ID: %s]", item->ID.c_str());
     #endif
+
+    ClearPresortedVectors();
 
     for (int i = 0; i < GetInventorySize(); i++)
     {
@@ -221,7 +222,6 @@ bool InventoryLib::Inventory::AddItem(BaseItem* item)
 bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
 {
     bool success = false;
-
     if (slot >= GetInventorySize() || slot < 0)
     {
         #ifdef _DEBUG
@@ -238,6 +238,7 @@ bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
         return false;
     }
 
+    ClearPresortedVectors();
     if (items->at(slot) != nullptr)
     {
         if (*items->at(slot) != *item)
@@ -288,6 +289,8 @@ bool InventoryLib::Inventory::AddItemToSlot(BaseItem* item, int slot)
 
 bool InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
 {
+    ClearPresortedVectors();
+
     if (amount == 0) return true;
 
     if (item == nullptr)
@@ -366,6 +369,8 @@ bool InventoryLib::Inventory::RemoveItem(BaseItem* item, int amount)
 
 bool InventoryLib::Inventory::RemoveItemInSlot(int slot, int amount)
 {
+    ClearPresortedVectors();
+
     if (!IsItemInSlotValid(slot))
     {
         return false;
@@ -413,13 +418,13 @@ bool InventoryLib::Inventory::RemoveItemInSlot(int slot, int amount)
 }
 
 
-void InventoryLib::Inventory::Sort(bool(* comparison)(const UniquePtrBaseItemVector&, int, bool), bool ascending)
+void InventoryLib::Inventory::Sort(std::function<bool(const SharedPtrBaseItem&, const SharedPtrBaseItem&)> comparison, bool ascending)
 {
     for (int i = 1; i < GetInventorySize(); i++)
     {
         for (int j = 0; j < GetInventorySize() - i; j++)
         {
-            if(comparison(items, j, ascending))
+            if(comparison(items->at(j), items->at(j+1)))
             {
                 MoveItemToSlot(j, j + 1);
             }
@@ -429,17 +434,20 @@ void InventoryLib::Inventory::Sort(bool(* comparison)(const UniquePtrBaseItemVec
 
 void InventoryLib::Inventory::SortByName(bool ascending)
 {
-    auto sorting = [](const UniquePtrBaseItemVector& items, int slotPos, bool ascending) -> bool
-        {
-            if (items->at(slotPos) == nullptr)
-            {
-                return true;
-            }
-            if (items->at(slotPos + 1) == nullptr) return false;
+    if (itemsSortedByName != nullptr)
+    {
+        *items = *itemsSortedByName;
+        return;
+    }
 
-            if (items->at(slotPos)->name == items->at(slotPos + 1)->name)
+    auto sorting = [ascending](const SharedPtrBaseItem& AItem, const SharedPtrBaseItem& BItem) -> bool
+        {
+            if (AItem == nullptr) return true;
+            if (BItem == nullptr) return false;
+
+            if (AItem->name == BItem->name)
             {
-                if (items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
+                if (AItem->currentStack < BItem->currentStack)
                 {
                     return true;
                 }
@@ -447,14 +455,14 @@ void InventoryLib::Inventory::SortByName(bool ascending)
 
             if (ascending)
             {
-                if (IsStringGreater(items->at(slotPos)->name, items->at(slotPos + 1)->name))
+                if (IsStringGreater(AItem->name, BItem->name))
                 {
                     return true;
                 }
             }
             else
             {
-                if (!IsStringGreater(items->at(slotPos)->name, items->at(slotPos + 1)->name))
+                if (!IsStringGreater(AItem->name, BItem->name))
                 {
                     return true;
                 }
@@ -464,23 +472,30 @@ void InventoryLib::Inventory::SortByName(bool ascending)
         };
 
     Sort(sorting, ascending);
+    itemsSortedByName = std::make_unique<BaseItemVector>(*items);
 }
 
 void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by tag name, than by name and than by stack size
 {
-    //bubble sort
-    auto sorting = [](const UniquePtrBaseItemVector& items, int slotPos, bool ascending) -> bool
+    if (itemsSortedByTag != nullptr)
     {
-            if (items->at(slotPos) == nullptr)
+        *items = *itemsSortedByTag;
+        return;
+    }
+
+    //bubble sort
+    auto sorting = [ascending](const SharedPtrBaseItem& AItem, const SharedPtrBaseItem& BItem) -> bool
+    {
+            if (AItem == nullptr)
             {
                 return true;
             }
-            if (items->at(slotPos + 1) == nullptr) return false;
+            if (BItem == nullptr) return false;
 
-            if (items->at(slotPos)->tag == items->at(slotPos + 1)->tag)
+            if (AItem->tag == BItem->tag)
             {
-                if (items->at(slotPos)->name == items->at(slotPos + 1)->name &&
-                    items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
+                if (AItem->name == BItem->name &&
+                    AItem->currentStack < BItem->currentStack)
                 {
                     return true;
                 }
@@ -489,14 +504,14 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
             if (ascending)
             {
 
-                if (IsStringGreater(items->at(slotPos)->tag, items->at(slotPos + 1)->tag))
+                if (IsStringGreater(AItem->tag, BItem->tag))
                 {
                     return true;
                 }
             }
             else
             {
-                if (!IsStringGreater(items->at(slotPos)->tag, items->at(slotPos + 1)->tag))
+                if (!IsStringGreater(AItem->tag, BItem->tag))
                 {
                     return true;
                 }
@@ -505,27 +520,34 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
     };
 
     Sort(sorting, ascending);
+    itemsSortedByTag = std::make_unique<BaseItemVector>(*items);
 }
 
 void InventoryLib::Inventory::SortByStack(bool ascending)
 {
-    auto sorting = [](const UniquePtrBaseItemVector& items, int slotPos, bool ascending) -> bool
+    if (itemsSortedByStack != nullptr)
+    {
+        *items = *itemsSortedByStack;
+        return;
+    }
+
+    auto sorting = [ascending](const SharedPtrBaseItem& AItem, const SharedPtrBaseItem& BItem) -> bool
         {
-            if (items->at(slotPos) == nullptr)
+            if (AItem == nullptr)
             {
                 return true;
             }
-            if (items->at(slotPos + 1) == nullptr) return false;
+            if (BItem == nullptr) return false;
 
-            if (items->at(slotPos)->currentStack == items->at(slotPos + 1)->currentStack)
+            if (AItem->currentStack == BItem->currentStack)
             {
-                if (items->at(slotPos)->name == items->at(slotPos + 1)->name &&
-                    items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
+                if (AItem->name == BItem->name &&
+                    AItem->currentStack < BItem->currentStack)
                 {
                     return true;
                 }
 
-                if (IsStringGreater(items->at(slotPos)->name, items->at(slotPos + 1)->name))
+                if (IsStringGreater(AItem->name, BItem->name))
                 {
                     return true;
                 }
@@ -534,14 +556,14 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
             if (ascending)
             {
 
-                if (items->at(slotPos)->currentStack > items->at(slotPos + 1)->currentStack)
+                if (AItem->currentStack > BItem->currentStack)
                 {
                     return true;
                 }
             }
             else
             {
-                if (items->at(slotPos)->currentStack < items->at(slotPos + 1)->currentStack)
+                if (AItem->currentStack < BItem->currentStack)
                 {
                     return true;
                 }
@@ -551,6 +573,51 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
         };
 
     Sort(sorting, ascending);
+    itemsSortedByStack = std::make_unique<BaseItemVector>(*items);
+}
+
+std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItemsByComparison(
+    std::function<bool(const SharedPtrBaseItem& items)> comparison) const
+{
+    std::vector<SharedPtrBaseItem> retVal{};
+
+    for (SharedPtrBaseItem item : *items)
+    {
+        if(comparison(item))
+        {
+            retVal.push_back(item);
+        }
+    }
+
+    return retVal;
+}
+
+std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItemsWithTag(std::string tag)
+{
+    auto comparison = [tag](const SharedPtrBaseItem item) -> bool
+        {
+            if (item == nullptr) return false;
+            return item->tag == tag;
+        };
+
+    return GetAllItemsByComparison(comparison);
+}
+
+std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItemsThatContain(std::string part)
+{
+    auto comparison = [part](const SharedPtrBaseItem item) -> bool
+        {
+            if (item == nullptr) return false;
+            if (item->name.find(part)) return true;
+            if (item->tag.find(part)) return true;
+            if (std::to_string(item->currentStack).find(part)) return true;
+            if (std::to_string(item->stackSize).find(part)) return true;
+            if (std::to_string(item->weightPerItem).find(part)) return true;
+            if (std::to_string(item->WeightOfStack()).find(part)) return true;
+            return false;
+        };
+
+    return GetAllItemsByComparison(comparison);
 }
 
 void InventoryLib::Inventory::MoveItemToSlot(int pos, int pos2)
@@ -576,6 +643,13 @@ void InventoryLib::Inventory::MoveItemToSlot(int pos, int pos2)
     items->at(pos2) = temp;
 }
 
+void InventoryLib::Inventory::ClearPresortedVectors()
+{
+    itemsSortedByName = nullptr;
+    itemsSortedByStack = nullptr;
+    itemsSortedByTag = nullptr;
+}
+
 
 std::string InventoryLib::Inventory::GetInventoryStructure(bool readable) const
 {
@@ -583,34 +657,47 @@ std::string InventoryLib::Inventory::GetInventoryStructure(bool readable) const
 
     for (int i = 0; i < GetInventorySize(); i++)
     {
+
         if (items->at(i) == nullptr) continue;
         if (!items->at(i)->IsValid()) continue;
-
-        if (readable)
-        {
-            retVal += "{\n";
-
-            retVal += "\tItemID:" + items->at(i)->ID + ":\n" + 
-                "\t{\n";
-
-            retVal += "\t\tName:" + items->at(i)->name + ";\n" + 
-                "\t\tTag:" + items->at(i)->tag + ";\n" + 
-                "\t\tStackSize:" + std::to_string(items->at(i)->stackSize) + ";\n" +
-                "\t\tCurrentStack:" + std::to_string(items->at(i)->currentStack) + ";\n" +
-                "\t\tSlot:" + std::to_string(i) + ";\n";
-
-            retVal += "\t}\n";
-            retVal += "}\n";
-        }
-        else
-        {
-            retVal += "{ItemID:" + items->at(i)->ID + ": "+
-                "{Name:" + items->at(i)->name + "; Tag:" + items->at(i)->tag + 
-                "; StackSize:" + std::to_string(items->at(i)->stackSize) + 
-                "; CurrentStack:" + std::to_string(items->at(i)->currentStack) +
-                "; Slot:" + std::to_string(i) + ";}}\n";
-        }
+        std::string temp = GetItemAsString(*items->at(i), readable);
+        if (temp.empty())  continue;
+        retVal += temp;
     }
+
+    return retVal;
+}
+
+std::string InventoryLib::Inventory::GetItemAsString(BaseItem item, bool readable) const
+{
+    std::string retVal = "";
+
+    if (!item.IsValid()) return retVal;
+
+    if (readable)
+    {
+        retVal += "{\n";
+
+        retVal += "\tItemID:" + item.ID + ":\n" +
+            "\t{\n";
+
+        retVal += "\t\tName:" + item.name + ";\n" +
+            "\t\tTag:" + item.tag + ";\n" +
+            "\t\tStackSize:" + std::to_string(item.stackSize) + ";\n" +
+            "\t\tCurrentStack:" + std::to_string(item.currentStack) + ";\n";
+
+        retVal += "\t}\n";
+        retVal += "}\n";
+    }
+    else
+    {
+        retVal += "{ItemID:" + item.ID + ": " +
+            "{Name:" + item.name + "; Tag:" + item.tag +
+            "; StackSize:" + std::to_string(item.stackSize) +
+            "; CurrentStack:" + std::to_string(item.currentStack) +
+            ";}}\n";
+    }
+    
     return retVal;
 }
 
@@ -656,8 +743,6 @@ bool InventoryLib::Inventory::HasItem(BaseItem* item, int amount) const
         {
             count += items->at(i)->currentStack;
         }
-
-        if (items->at(i) == nullptr) continue;
     }
 
     return count >= amount;
@@ -688,7 +773,11 @@ bool InventoryLib::Inventory::HasEnoughSpaceToAddItem(BaseItem* item) const
     {
         return true;
     }
-    HasItem(item);
+
+    if(!HasItem(item))
+    {
+        return false;
+    }
 
     std::vector<int> slotsWithItem = GetSlotsWithItem(item);
     int spaceAvailable = 0;

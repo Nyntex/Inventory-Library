@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include "BaseItem.h"
 #include <vector>
@@ -72,7 +73,9 @@ namespace InventoryLib
         float weight = 0.0f;       //the weight of the inventory
 
         UniquePtrBaseItemVector items;
-
+        UniquePtrBaseItemVector itemsSortedByName;
+        UniquePtrBaseItemVector itemsSortedByTag;
+        UniquePtrBaseItemVector itemsSortedByStack;
 
 #pragma endregion
 
@@ -88,15 +91,20 @@ namespace InventoryLib
         virtual bool RemoveItemInSlot(int slot, int amount = -1);
 
         //Takes a lambda function which is optimised for a bubble sort
-        virtual void Sort(bool (*comparison)(const UniquePtrBaseItemVector&,int,bool), bool ascending);
+        virtual void Sort(std::function<bool(const SharedPtrBaseItem&, const SharedPtrBaseItem&)> comparison, bool ascending);
         virtual void SortByName(bool ascending = true);
         virtual void SortByTag(bool ascending = true);
-        virtual void SortByStack(bool ascending = true);
+        virtual void SortByStack(bool ascending = false);
+        virtual std::vector<SharedPtrBaseItem> GetAllItemsByComparison(std::function<bool(const SharedPtrBaseItem& items)> comparison) const;
+        virtual std::vector<SharedPtrBaseItem> GetAllItemsWithTag(std::string tag);
+        virtual std::vector<SharedPtrBaseItem> GetAllItemsThatContain(std::string part);
         virtual void MoveItemToSlot(int pos, int pos2);
+        virtual void ClearPresortedVectors();
 
         virtual SharedPtrBaseItem GetItemInSlot(int slot) const;
         virtual float GetCurrentCarryingWeight() const;
         virtual std::string GetInventoryStructure(bool readable = true) const;
+        virtual std::string GetItemAsString(BaseItem item, bool readable) const;
         virtual std::vector<int> FindItem(BaseItem* item, bool allowFullStacks = true) const;
         virtual bool HasItem(BaseItem* item, int amount = 1) const;
         virtual std::vector<int> GetSlotsWithItem(BaseItem* item) const;

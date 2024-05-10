@@ -1,13 +1,12 @@
 #include <iostream>
 #include "Inventory.h"
+#include "windows.h"
+
+const std::string tags[]{ "Weapon", "Chestplate", "Helmet", "Gloves", "Bow", "Boots" };
 
 InventoryLib::BaseItem* RandomItem()
 {
-    std::string randomTag{};
-    for (int i = 0; i < 8; i++)
-    {
-        randomTag += char((rand() % 26) + 65);
-    }
+    std::string randomTag{ tags[int(rand() % (tags->size()))] };
 
     std::string randomName{};
     for (int i = 0; i < 4; i++)
@@ -36,8 +35,12 @@ InventoryLib::BaseItem* RandomItem()
 
 int main()
 {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    SetConsoleTextAttribute(hConsole, 6);
     printf("--- Creation and deletion of Inventory ---\n");
-    if(false)
+    SetConsoleTextAttribute(hConsole, 7);
+    if(true)
     {
         InventoryLib::Inventory* temp = new InventoryLib::Inventory();
         delete temp;
@@ -46,7 +49,9 @@ int main()
         printf("\n");
     }
 
+    SetConsoleTextAttribute(hConsole, 6);
     printf("--- Creation of inventory with slots and shrinking it ---\n");
+    SetConsoleTextAttribute(hConsole, 7);
     if(true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
@@ -75,7 +80,9 @@ int main()
         printf("\n");
     }
 
+    SetConsoleTextAttribute(hConsole, 6);
     printf("--- Testing Sort by Name ---\n");
+    SetConsoleTextAttribute(hConsole, 7);
     if(true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
@@ -104,7 +111,9 @@ int main()
         printf("\n");
     }
 
+    SetConsoleTextAttribute(hConsole, 6);
     printf("--- Testing Sort by Tag ---\n");
+    SetConsoleTextAttribute(hConsole, 7);
     if (true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
@@ -131,8 +140,10 @@ int main()
         printf("\n");
         printf("\n");
     }
-    
+
+    SetConsoleTextAttribute(hConsole, 6);
     printf("--- Testing Sort by Stack ---\n");
+    SetConsoleTextAttribute(hConsole, 7);
     if (true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
@@ -162,7 +173,42 @@ int main()
         printf("\n");
     }
 
+    SetConsoleTextAttribute(hConsole, 6);
+    printf("--- All sorts in a row ---\n");
+    SetConsoleTextAttribute(hConsole, 7);
+    if (true)
+    {
+        InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
+        for (int i = 0; i < 10; i++)
+        {
+            inv->AddItem(RandomItem());
+        }
+
+        printf("--- UNSORTED ---\n");
+        printf(inv->GetInventoryStructure(false).c_str());
+        printf("\n");
+        inv->SortByName();
+        printf("--- Sorted by Name ---\n");
+        printf(inv->GetInventoryStructure(false).c_str());
+        printf("\n");
+        inv->SortByStack(false);
+        printf("--- Sorted by Stack ---\n");
+        printf(inv->GetInventoryStructure(false).c_str());
+        printf("\n");
+        inv->SortByTag();
+        printf("--- Sorted by Tag ---\n");
+        printf(inv->GetInventoryStructure(false).c_str());
+        printf("\n");
+
+        inv->SortByTag();
+        printf("Breakpoint for looking into inventory");
+        inv->AddItem(RandomItem());
+        printf("Breakpoint for looking into inventory");
+    }
+
+    SetConsoleTextAttribute(hConsole, 6);
     printf("--- Copy Inventory ---\n");
+    SetConsoleTextAttribute(hConsole, 7);
     if(true)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
@@ -195,9 +241,34 @@ int main()
         printf("\n");
     }
 
+    SetConsoleTextAttribute(hConsole, 6);
+    printf("--- Get All Items with Tag Weapon ---\n");
+    SetConsoleTextAttribute(hConsole, 7);
+    if (true)
+    {
+        InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
+        for(int i = 0; i < 20; i++)
+        {
+            inv->AddItem(RandomItem());
+        }
+        printf("All Items, sorted by tag\n");
+        inv->SortByTag();
+        printf(inv->GetInventoryStructure(false).c_str());
 
-    //int* ignored;
-    //printf("Does the inventory contain the item? : %s\n", inv->HasItem(new InventoryLib::BaseItem(*randomItem1), ignored, 64) ? "True" : "False");
+        printf("\n");
+        printf("Weapons Only\n");
+        std::vector<std::shared_ptr<InventoryLib::BaseItem>> weapons = inv->GetAllItemsWithTag("Weapon");
 
+        for(int i = 0; i < weapons.size(); i++)
+        {
+            std::string temp = inv->GetItemAsString(*weapons[i], false);
+            if (temp.empty()) continue;
+            printf(temp.c_str());
+        }
+        printf("\n");
+    }
+
+
+    
     std::cin.get();
 }
