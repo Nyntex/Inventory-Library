@@ -10,7 +10,7 @@ namespace InventoryLib
         BaseItem();
         BaseItem(const BaseItem& other);
         BaseItem(std::string newName, std::string newID, int newStackSize, int newCurrentStack);
-        BaseItem(std::string newName, std::string newTag, std::string newID, int newStackSize, int newCurrentStack);
+        BaseItem(std::string newName, std::string newTag, std::string newID, int newStackSize = 50, int newCurrentStack = 1, float newWeightPerItem = 0.f);
         virtual ~BaseItem();
 
         std::string name = "None";

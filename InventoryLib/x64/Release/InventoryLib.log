@@ -1,5 +1,7 @@
-﻿  pch.cpp
-  BaseItem.cpp
+﻿  BaseItem.cpp
   Inventory.cpp
   InventoryLib.cpp
-  InventoryLib.vcxproj -> C:\Users\Nyntex\Desktop\Final Thesis\Inventory-Library\x64\Release\Lib\InventoryLib.lib
+  pch.cpp
+  InventoryLib.vcxproj -> C:\Users\Nyntex\Desktop\Final Thesis\Inventory-Library\Testing Application\ThirdParty\Lib\Release\x64\InventoryLib.lib
+          1 file(s) copied.
+          1 file(s) copied.

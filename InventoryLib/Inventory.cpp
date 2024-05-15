@@ -4,6 +4,8 @@
 
 #pragma region De/Constructors
 
+
+
 InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, int maxSlots, bool newAutoResize, float maxWeight)
 {
     #ifdef _DEBUG

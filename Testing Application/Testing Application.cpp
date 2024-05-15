@@ -259,7 +259,7 @@ int main()
         printf("Weapons Only\n");
         std::vector<std::shared_ptr<InventoryLib::BaseItem>> weapons = inv->GetAllItemsWithTag("Weapon");
 
-        for(int i = 0; i < weapons.size(); i++)
+        for(int i = 0; i < static_cast<int>(weapons.size()); i++)
         {
             std::string temp = inv->GetItemAsString(*weapons[i], false);
             if (temp.empty()) continue;
@@ -267,7 +267,6 @@ int main()
         }
         printf("\n");
     }
-
 
     
     std::cin.get();
