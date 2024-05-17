@@ -16,6 +16,7 @@ InventoryLib::Inventory::Inventory(int newSlotCount, float newWeight, int maxSlo
     this->maxSlots = maxSlots;
     this->maxCarryWeight = maxWeight;
     this->weight = newWeight;
+    this->autoResize = newAutoResize;
     this->items = std::make_unique<BaseItemVector>(newSlotCount);
 }
 

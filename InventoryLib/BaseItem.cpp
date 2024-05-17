@@ -30,3 +30,36 @@ InventoryLib::BaseItem::BaseItem(std::string newName, std::string newTag, std::s
 InventoryLib::BaseItem::~BaseItem()
 {
 }
+
+std::string InventoryLib::BaseItem::GetAsString(bool readable) const
+{
+    std::string retVal{};
+
+    if (!IsValid()) return retVal;
+
+    if (readable)
+    {
+        retVal += "{\n";
+
+        retVal += "\tItemID:" + ID + ":\n" +
+            "\t{\n";
+
+        retVal += "\t\tName:" + name + ";\n" +
+            "\t\tTag:" + tag + ";\n" +
+            "\t\tStackSize:" + std::to_string(stackSize) + ";\n" +
+            "\t\tCurrentStack:" + std::to_string(currentStack) + ";\n";
+
+        retVal += "\t}\n";
+        retVal += "}\n";
+    }
+    else
+    {
+        retVal += "{ ItemID:" + ID + ": " +
+            "{  Name:" + name + ";  Tag:" + tag +
+            ";  StackSize:" + std::to_string(stackSize) +
+            ";  CurrentStack:" + std::to_string(currentStack) +
+            "; }}\n";
+    }
+
+    return retVal;
+}

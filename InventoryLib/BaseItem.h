@@ -53,16 +53,19 @@ namespace InventoryLib
 
         virtual bool IsValid() const
         {
+            if (this == nullptr) return false;
             return currentStack > 0;
         }
-        virtual bool IsStackFull()
+        virtual bool IsStackFull() const
         {
             return stackSize == currentStack;
         }
-        virtual float WeightOfStack()
+        virtual float WeightOfStack() const
         {
             return weightPerItem * static_cast<float>(currentStack);
         }
+
+        virtual std::string GetAsString(bool readable) const;
     };
 }
 
