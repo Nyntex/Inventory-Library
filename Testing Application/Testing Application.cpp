@@ -159,6 +159,7 @@ int main()
                 tempItem->currentStack = tempItem->stackSize;
             }
             inv->AddItem(tempItem);
+            inv->AddItem(tempItem);
         }
         printf("\n");
 
@@ -168,7 +169,10 @@ int main()
         printf("\n");
         printf("--- SORTED BY STACK ---\n");
         printf(inv->GetInventoryStructure(false).c_str());
+        inv->SortByStack(true);
         printf("\n");
+        printf(inv->GetInventoryStructure(false).c_str());
+        inv->SortByStack(false);
         printf("\n");
         printf("\n");
     }
@@ -176,7 +180,7 @@ int main()
     SetConsoleTextAttribute(hConsole, 6);
     printf("--- All sorts in a row ---\n");
     SetConsoleTextAttribute(hConsole, 7);
-    if (true)
+    if (false)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         for (int i = 0; i < 10; i++)
@@ -209,7 +213,7 @@ int main()
     SetConsoleTextAttribute(hConsole, 6);
     printf("--- Copy Inventory ---\n");
     SetConsoleTextAttribute(hConsole, 7);
-    if(true)
+    if(false)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         inv->AddItem(RandomItem());
@@ -244,7 +248,7 @@ int main()
     SetConsoleTextAttribute(hConsole, 6);
     printf("--- Get All Items with Tag Weapon ---\n");
     SetConsoleTextAttribute(hConsole, 7);
-    if (true)
+    if (false)
     {
         InventoryLib::Inventory* inv = new InventoryLib::Inventory(100);
         for(int i = 0; i < 20; i++)

@@ -53,6 +53,7 @@ namespace InventoryLib
 
         virtual bool IsValid() const
         {
+            if (this == nullptr) return false;
             return currentStack > 0;
         }
         virtual bool IsStackFull() const

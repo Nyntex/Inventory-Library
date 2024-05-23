@@ -74,8 +74,11 @@ namespace InventoryLib
         float weight = 0.0f;       //the weight of the inventory
 
         UniquePtrBaseItemVector items;
+        bool lastNameSortWasAscending = false;
         UniquePtrBaseItemVector itemsSortedByName;
+        bool lastTagSortWasAscending = false;
         UniquePtrBaseItemVector itemsSortedByTag;
+        bool lastStackSortWasAscending = false;
         UniquePtrBaseItemVector itemsSortedByStack;
 
 #pragma endregion

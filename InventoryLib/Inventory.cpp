@@ -437,11 +437,12 @@ void InventoryLib::Inventory::Sort(std::function<bool(const SharedPtrBaseItem&, 
 
 void InventoryLib::Inventory::SortByName(bool ascending)
 {
-    if (itemsSortedByName != nullptr)
+    if (itemsSortedByName != nullptr && lastNameSortWasAscending == ascending)
     {
         *items = *itemsSortedByName;
         return;
     }
+    lastNameSortWasAscending = ascending;
 
     auto sorting = [ascending](const SharedPtrBaseItem& AItem, const SharedPtrBaseItem& BItem) -> bool
         {
@@ -456,7 +457,7 @@ void InventoryLib::Inventory::SortByName(bool ascending)
                 }
             }
 
-            if (ascending)
+            if(ascending)
             {
                 if (IsStringGreater(AItem->name, BItem->name))
                 {
@@ -480,15 +481,15 @@ void InventoryLib::Inventory::SortByName(bool ascending)
 
 void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by tag name, than by name and than by stack size
 {
-    if (itemsSortedByTag != nullptr)
+    if (itemsSortedByTag != nullptr && lastTagSortWasAscending == ascending)
     {
         *items = *itemsSortedByTag;
         return;
     }
+    lastTagSortWasAscending = ascending;
 
-    //bubble sort
     auto sorting = [ascending](const SharedPtrBaseItem& AItem, const SharedPtrBaseItem& BItem) -> bool
-    {
+        {
             if (AItem == nullptr)
             {
                 return true;
@@ -502,11 +503,15 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
                 {
                     return true;
                 }
+
+                if (IsStringGreater(AItem->name, BItem->name))
+                {
+                    return true;
+                }
             }
 
-            if (ascending)
+            if(ascending)
             {
-
                 if (IsStringGreater(AItem->tag, BItem->tag))
                 {
                     return true;
@@ -519,22 +524,25 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
                     return true;
                 }
             }
+
             return false;
-    };
+        };
 
     Sort(sorting, ascending);
+
     itemsSortedByTag = std::make_unique<BaseItemVector>(*items);
 }
 
 void InventoryLib::Inventory::SortByStack(bool ascending)
 {
-    if (itemsSortedByStack != nullptr)
+    if (itemsSortedByStack != nullptr && lastStackSortWasAscending == ascending)
     {
         *items = *itemsSortedByStack;
         return;
     }
+    lastStackSortWasAscending = ascending;
 
-    auto sorting = [ascending](const SharedPtrBaseItem& AItem, const SharedPtrBaseItem& BItem) -> bool
+    auto ascendingSort = [ascending](const SharedPtrBaseItem& AItem, const SharedPtrBaseItem& BItem) -> bool
         {
             if (AItem == nullptr)
             {
@@ -545,7 +553,7 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
             if (AItem->currentStack == BItem->currentStack)
             {
                 if (AItem->name == BItem->name &&
-                    AItem->currentStack < BItem->currentStack)
+                    AItem->stackSize < BItem->stackSize)
                 {
                     return true;
                 }
@@ -556,9 +564,8 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
                 }
             }
 
-            if (ascending)
+            if(ascending)
             {
-
                 if (AItem->currentStack > BItem->currentStack)
                 {
                     return true;
@@ -575,7 +582,8 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
             return false;
         };
 
-    Sort(sorting, ascending);
+    Sort(ascendingSort, ascending);
+
     itemsSortedByStack = std::make_unique<BaseItemVector>(*items);
 }
 
