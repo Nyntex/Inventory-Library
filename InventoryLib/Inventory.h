@@ -27,8 +27,7 @@ namespace InventoryLib
         Inventory(const Inventory& other); // copy constructor will copy the values of the items and not their shared pointer
         virtual ~Inventory();
 
-        //copy assignment operator will copy the values of the items and not their shared pointer
-        Inventory& operator=(const Inventory& other) 
+        Inventory& operator=(const Inventory& other)
         {
             if (this != &other)
             {
@@ -86,8 +85,10 @@ namespace InventoryLib
 
 #pragma region Functions
     public:
+        
         virtual bool SetSlotCount(int newSlotCount);
 
+        
         virtual bool AddItem(BaseItem* item);
         virtual bool AddItemToSlot(BaseItem* item, int slot);
 

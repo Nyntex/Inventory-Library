@@ -19,7 +19,9 @@ namespace InventoryLib
     std::string MakeStringUpperCase(const std::string& word);
     bool IsStringGreater(const std::string& first, const std::string& second, int pos = 0);
 
+    /// <summary> Inventory Class </summary>
     class Inventory
+        /// <summary> Inventory Class </summary>
     {
     public:
 #pragma region Constructor and operator

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        "InventoryLib"
+    </assembly>
+    <members>
+        <member name="T:InventoryLib.Inventory">
+            <summary> Inventory Class </summary>
+            <summary> Inventory Class </summary>
+        </member>
+    </members>
+</doc>
