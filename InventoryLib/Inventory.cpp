@@ -421,7 +421,7 @@ bool InventoryLib::Inventory::RemoveItemInSlot(int slot, int amount)
 }
 
 
-void InventoryLib::Inventory::Sort(std::function<bool(const SharedPtrBaseItem&, const SharedPtrBaseItem&)> comparison, bool ascending)
+void InventoryLib::Inventory::Sort(std::function<bool(const SharedPtrBaseItem&, const SharedPtrBaseItem&)> comparison)
 {
     for (int i = 1; i < GetInventorySize(); i++)
     {
@@ -475,7 +475,7 @@ void InventoryLib::Inventory::SortByName(bool ascending)
             return false;
         };
 
-    Sort(sorting, ascending);
+    Sort(sorting);
     itemsSortedByName = std::make_unique<BaseItemVector>(*items);
 }
 
@@ -528,7 +528,7 @@ void InventoryLib::Inventory::SortByTag(bool ascending) //first tries to sort by
             return false;
         };
 
-    Sort(sorting, ascending);
+    Sort(sorting);
 
     itemsSortedByTag = std::make_unique<BaseItemVector>(*items);
 }
@@ -582,7 +582,7 @@ void InventoryLib::Inventory::SortByStack(bool ascending)
             return false;
         };
 
-    Sort(ascendingSort, ascending);
+    Sort(ascendingSort);
 
     itemsSortedByStack = std::make_unique<BaseItemVector>(*items);
 }
@@ -603,7 +603,7 @@ std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItem
     return retVal;
 }
 
-std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItemsWithTag(std::string tag)
+std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItemsWithTag(std::string tag) const
 {
     auto comparison = [tag](const SharedPtrBaseItem item) -> bool
         {
@@ -614,7 +614,7 @@ std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItem
     return GetAllItemsByComparison(comparison);
 }
 
-std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItemsThatContain(std::string part)
+std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItemsThatContain(std::string part) const
 {
     auto comparison = [part](const SharedPtrBaseItem item) -> bool
         {

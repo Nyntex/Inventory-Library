@@ -1,10 +1,15 @@
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.pch
 c:\users\nyntex\desktop\final thesis\inventory-library\testing application\thirdparty\lib\release\x64\inventorylib.pdb
+c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\pch.xdc
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\pch.obj
+c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\baseitem.xdc
+c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventory.xdc
+c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.xdc
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.obj
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventory.obj
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\baseitem.obj
 c:\users\nyntex\desktop\final thesis\inventory-library\testing application\thirdparty\lib\release\x64\inventorylib.lib
+c:\users\nyntex\desktop\final thesis\inventory-library\testing application\thirdparty\lib\release\x64\inventorylib.xml
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\cl.command.1.tlog
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\cl.items.tlog
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\cl.read.1.tlog
@@ -12,3 +17,6 @@ c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\lib-link.read.1.tlog
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\lib-link.write.1.tlog
 c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\lib.command.1.tlog
+c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\xdcmake.command.1.tlog
+c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\xdcmake.read.1.tlog
+c:\users\nyntex\desktop\final thesis\inventory-library\inventorylib\x64\release\inventorylib.tlog\xdcmake.write.1.tlog

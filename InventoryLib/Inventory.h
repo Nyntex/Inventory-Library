@@ -24,7 +24,7 @@ namespace InventoryLib
     public:
 #pragma region Constructor and operator
         Inventory(int newSlotCount = 1, float newWeight = -1, int maxSlots = -1, bool newAutoResize = false, float maxWeight = -1.0f);
-        Inventory(const Inventory& other); // copy constructor will copy the values of the items and not their shared pointer
+        Inventory(const Inventory& other); // copy constructor will copy the values of the item and not their shared pointer
         virtual ~Inventory();
 
         Inventory& operator=(const Inventory& other)
@@ -65,7 +65,7 @@ namespace InventoryLib
 #pragma endregion
 
 #pragma region Member
-    private:
+    protected:
         int maxSlots = -1;// -1 deactivates max slots and the inventory can grow almost indefinitely
         bool autoResize = false; //whether to add new slots when the last slot is getting filled
 
@@ -96,13 +96,13 @@ namespace InventoryLib
         virtual bool RemoveItemInSlot(int slot, int amount = -1);
 
         //Takes a lambda function which is optimised for a bubble sort
-        virtual void Sort(std::function<bool(const SharedPtrBaseItem&, const SharedPtrBaseItem&)> comparison, bool ascending);
+        virtual void Sort(std::function<bool(const SharedPtrBaseItem&, const SharedPtrBaseItem&)> comparison);
         virtual void SortByName(bool ascending = true);
         virtual void SortByTag(bool ascending = true);
         virtual void SortByStack(bool ascending = false);
-        virtual std::vector<SharedPtrBaseItem> GetAllItemsByComparison(std::function<bool(const SharedPtrBaseItem& items)> comparison) const;
-        virtual std::vector<SharedPtrBaseItem> GetAllItemsWithTag(std::string tag);
-        virtual std::vector<SharedPtrBaseItem> GetAllItemsThatContain(std::string part);
+        virtual std::vector<SharedPtrBaseItem> GetAllItemsByComparison(std::function<bool(const SharedPtrBaseItem& item)> comparison) const;
+        virtual std::vector<SharedPtrBaseItem> GetAllItemsWithTag(std::string tag) const;
+        virtual std::vector<SharedPtrBaseItem> GetAllItemsThatContain(std::string part) const;
         virtual void MoveItemToSlot(int pos, int pos2);
         virtual void ClearPresortedVectors();
 
