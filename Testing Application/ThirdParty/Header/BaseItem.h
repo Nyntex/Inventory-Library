@@ -9,7 +9,6 @@ namespace InventoryLib
     public:
         BaseItem();
         BaseItem(const BaseItem& other);
-        BaseItem(std::string newName, std::string newID, int newStackSize, int newCurrentStack);
         BaseItem(std::string newName, std::string newTag, std::string newID, int newStackSize = 50, int newCurrentStack = 1, float newWeightPerItem = 0.f);
         virtual ~BaseItem();
 
@@ -51,10 +50,10 @@ namespace InventoryLib
         }
 
 
-        virtual bool IsValid() const
+        bool IsValid() const
         {
             if (this == nullptr) return false;
-            return currentStack > 0;
+            return currentStack > 0 && stackSize > 0 && !ID.empty() && !name.empty() && !tag.empty();
         }
         virtual bool IsStackFull() const
         {

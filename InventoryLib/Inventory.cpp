@@ -631,27 +631,27 @@ std::vector<InventoryLib::SharedPtrBaseItem> InventoryLib::Inventory::GetAllItem
     return GetAllItemsByComparison(comparison);
 }
 
-void InventoryLib::Inventory::MoveItemToSlot(int pos, int pos2)
+void InventoryLib::Inventory::MoveItemToSlot(int itemPos, int newItemPos)
 {
-    if (!IsSlotValid(pos))
+    if (!IsSlotValid(itemPos))
     {
         #ifdef _DEBUG
-        printf("Slot is invalid: %i", pos);
+        printf("Slot is invalid: %i", itemPos);
         #endif
         return;
     }
 
-    if (!IsSlotValid(pos2))
+    if (!IsSlotValid(newItemPos))
     {
         #ifdef _DEBUG
-        printf("Slot is invalid: %i", pos2);
+        printf("Slot is invalid: %i", newItemPos);
         #endif
         return;
     }
 
-    SharedPtrBaseItem temp = items->at(pos);
-    items->at(pos) = items->at(pos2);
-    items->at(pos2) = temp;
+    SharedPtrBaseItem temp = items->at(itemPos);
+    items->at(itemPos) = items->at(newItemPos);
+    items->at(newItemPos) = temp;
 }
 
 void InventoryLib::Inventory::ClearPresortedVectors()
@@ -681,35 +681,7 @@ std::string InventoryLib::Inventory::GetInventoryStructure(bool readable) const
 
 std::string InventoryLib::Inventory::GetItemAsString(BaseItem item, bool readable) const
 {
-    std::string retVal = "";
-
-    if (!item.IsValid()) return retVal;
-
-    if (readable)
-    {
-        retVal += "{\n";
-
-        retVal += "\tItemID:" + item.ID + ":\n" +
-            "\t{\n";
-
-        retVal += "\t\tName:" + item.name + ";\n" +
-            "\t\tTag:" + item.tag + ";\n" +
-            "\t\tStackSize:" + std::to_string(item.stackSize) + ";\n" +
-            "\t\tCurrentStack:" + std::to_string(item.currentStack) + ";\n";
-
-        retVal += "\t}\n";
-        retVal += "}\n";
-    }
-    else
-    {
-        retVal += "{ItemID:" + item.ID + ": " +
-            "{Name:" + item.name + "; Tag:" + item.tag +
-            "; StackSize:" + std::to_string(item.stackSize) +
-            "; CurrentStack:" + std::to_string(item.currentStack) +
-            ";}}\n";
-    }
-    
-    return retVal;
+    return item.GetAsString(readable);
 }
 
 std::vector<int> InventoryLib::Inventory::FindItem(BaseItem* item, bool allowFullStacks) const
@@ -753,10 +725,11 @@ bool InventoryLib::Inventory::HasItem(BaseItem* item, int amount) const
         else if(*items->at(i) == *item)
         {
             count += items->at(i)->currentStack;
+            if (count >= amount) return true;
         }
     }
 
-    return count >= amount;
+    return false;
 }
 
 std::vector<int> InventoryLib::Inventory::GetSlotsWithItem(BaseItem* item) const

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <map>
 #include <memory>
 #include "BaseItem.h"
 #include <vector>
@@ -103,7 +102,7 @@ namespace InventoryLib
         virtual std::vector<SharedPtrBaseItem> GetAllItemsByComparison(std::function<bool(const SharedPtrBaseItem& item)> comparison) const;
         virtual std::vector<SharedPtrBaseItem> GetAllItemsWithTag(std::string tag) const;
         virtual std::vector<SharedPtrBaseItem> GetAllItemsThatContain(std::string part) const;
-        virtual void MoveItemToSlot(int pos, int pos2);
+        virtual void MoveItemToSlot(int itemPos, int newItemPos);
         virtual void ClearPresortedVectors();
 
         virtual SharedPtrBaseItem GetItemInSlot(int slot) const;
@@ -118,11 +117,15 @@ namespace InventoryLib
         {
             return static_cast<int>(items->size());
         }
-        virtual bool IsInventoryFull() const
+        virtual bool IsInventoryFull(bool checkStacks = false) const
         {
             for (const SharedPtrBaseItem& item : *items)
             {
                 if (item == nullptr) return false;
+                if(checkStacks)
+                {
+                    if (!item->IsStackFull()) return false;
+                }
             }
 
             return true;

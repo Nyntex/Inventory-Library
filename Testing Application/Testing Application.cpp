@@ -35,6 +35,9 @@ InventoryLib::BaseItem* RandomItem()
 
 int main()
 {
+    InventoryLib::BaseItem* item = nullptr;
+    printf(item->IsValid() ? "true" : "false");
+
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
     SetConsoleTextAttribute(hConsole, 6);

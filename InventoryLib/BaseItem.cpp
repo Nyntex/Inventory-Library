@@ -12,13 +12,6 @@ InventoryLib::BaseItem::BaseItem(const BaseItem& other)
     currentStack = other.currentStack;
 }
 
-InventoryLib::BaseItem::BaseItem(std::string newName, std::string newID, int newStackSize, int newCurrentStack)
-    : ID(newID), stackSize(newStackSize)
-{
-    name = newName;
-    currentStack = newCurrentStack;
-}
-
 InventoryLib::BaseItem::BaseItem(std::string newName, std::string newTag, std::string newID, int newStackSize, int newCurrentStack, float newWeightPerItem)
     : ID(newID), tag(newTag), stackSize(newStackSize)
 {
